@@ -4,6 +4,7 @@
 - [Triangle](https://github.com/esimov/triangle)
 - [PloyFun](https://github.com/hugeterry/PloyFun)
 - [Trianglar](https://github.com/tdh8316/triangler)
+- [PyTri](https://github.com/pmaldonado/PyTri)
 ## Delaunay Trangulation Libraries 
 - [Rust](https://github.com/mourner/delaunator-rs)
 - [C++](https://github.com/delfrrr/delaunator-cpp)
