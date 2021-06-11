@@ -3,7 +3,7 @@ project(triangulation)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(EXTERNAL_LIB_HEADERS lib/delaunator-cpp/include)
+set(EXTERNAL_LIB_HEADERS lib/delaunator)
 
 add_executable(triangulation main.cpp)
 
