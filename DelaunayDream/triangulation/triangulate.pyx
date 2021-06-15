@@ -1,9 +1,12 @@
+# distutils: language = c++
+# cython: language_level=3
+
 import cv2 as cv
 import numpy as np
 cimport numpy as np
 from libcpp.vector cimport vector
 
-# tests needed
+
 cdef extern from "lib/delaunator.hpp" namespace "delaunator":
     cdef cppclass Delaunator:
         Delaunator(vector[double]& in_coords) except +
@@ -15,11 +18,12 @@ cdef delaunator_triangulate(coords):
     cdef vector[double] coords_vec = coords
     cdef Delaunator* d = new Delaunator(coords_vec)
 
-    cdef double[::1] arr_coords = <double [:d.coords.size()]>d.coords.data()
     cdef size_t[::1] arr_triangles = <size_t [:d.triangles.size()]>d.triangles.data()
 
-    np_coords = np.asarray(arr_coords)
+    np_coords = np.asarray(coords)
     np_triangles = np.asarray(arr_triangles)
+
+    np_coords = np_coords.reshape((-1, 2))
 
     return np_coords[np_triangles]
 
@@ -38,19 +42,7 @@ def triangulate_frame(frame, coordinates):
         # the bottleneck point: 1.6 second for 2000 triangles, 50%-60% of runtime without the cpp lib
         mean_color = cv.mean(trig_frame, mask)
 
-        cv.polylines(trig_frame, [triangle], isClosed=True, color=(255, 255, 255), thickness=2)
+        # cv.polylines(trig_frame, [triangle], isClosed=True, color=(255, 255, 255), thickness=2)
         cv.fillPoly(trig_frame, [triangle], mean_color)
 
     return trig_frame
-
-
-if __name__ == "__main__":
-    img = cv.imread("sample.jpg")
-    # if img is None:
-    #     sys.exit("Could not read the image.")
-
-    temp_pts = [214, 36, 311, 65, 211, 135, 414, 36, 511, 65, 411, 135] * 1000
-    trig_img = triangulate_frame(img, temp_pts)
-
-    cv.imshow("Display window", trig_img)
-    cv.waitKey(0)
