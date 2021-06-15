@@ -7,6 +7,7 @@ setup(
     url="https://github.com/chensation/Delaunay-Dream.git",
     author="princess",
     include_package_data = True,
+    # install_requires = [], # Make sure to add the libraries we use here.
     entry_points={
             "console_scripts":[
                 "plzrun = DelaunayDream.testee.deep.gem:main",
