@@ -53,6 +53,10 @@ def apply_triangulation(frames):
     #
     return triangulated_frames
 
-def generate_result(frames):
+def generate_gray(frames):
     for frame in frames:
         out_gray.write(frame)
+
+def generate_color(frames):
+    for frame in frames:
+        out_color.write(frame)
