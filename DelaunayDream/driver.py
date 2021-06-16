@@ -6,7 +6,6 @@ import sys
 
 
 def main():
-
     img = cv.imread("DelaunayDream/triangulation/sample.jpg")
     if img is None:
         sys.exit("Could not read the image.")
