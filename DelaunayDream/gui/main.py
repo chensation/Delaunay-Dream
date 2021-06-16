@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         self.video.setPixmap(QtGui.QPixmap("image.jpg"))
         self.video.setScaledContents(True)
         self.video.setObjectName("video")
-        self.video_playback_layout.addWidget(self.video, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
+        self.video_playback_layout.addWidget(self.video)
         self.playback_slider = QtWidgets.QSlider(self.layoutWidget)
         self.playback_slider.setToolTip("")
         self.playback_slider.setMaximum(99)
@@ -79,7 +79,7 @@ class Ui_MainWindow(object):
         font.setPointSize(11)
         self.stop_button.setFont(font)
         self.stop_button.setObjectName("stop_button")
-        self.video_buttons_layout.addWidget(self.stop_button, 0, QtCore.Qt.AlignVCenter)
+        self.video_buttons_layout.addWidget(self.stop_button)
         spacerItem3 = QtWidgets.QSpacerItem(248, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.video_buttons_layout.addItem(spacerItem3)
         self.video_playback_layout.addLayout(self.video_buttons_layout)
@@ -335,11 +335,10 @@ class Ui_MainWindow(object):
     def loadVideo(self):
         self.filename = QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
 
-
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
+    MainWindow = QtWidgets.QMainWindow(
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
