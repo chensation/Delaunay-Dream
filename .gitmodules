@@ -1,0 +1,3 @@
+[submodule "DelaunayDream/triangulation/lib/delaunator-cpp"]
+	path = DelaunayDream/triangulation/lib/delaunator-cpp
+	url = https://github.com/delfrrr/delaunator-cpp.git
