@@ -2,17 +2,23 @@
 # from DelaunayDream.testee.test import plzexport
 from DelaunayDream.triangulation.triangulate import triangulate_frame
 import cv2 as cv
+import sys
 
 
 def main():
-    print("hello")
-    # plzexport()
 
-    img = cv.imread("DelaunayDream/triangulation/sample.jpg")
-    # if img is None:
-    #     sys.exit("Could not read the image.")
+    img = cv.imread("triangulation/sample.jpg")
+    if img is None:
+        sys.exit("Could not read the image.")
 
-    temp_pts = [214, 36, 311, 65, 211, 135, 414, 36, 511, 65, 411, 135] * 1000
+    f = open("triangulation/coords.txt", "r")
+
+    temp_pts = f.read().split(" ")
+    temp_pts.pop()
+    temp_pts = [int(i) for i in temp_pts]
+
+    f.close()
+
     trig_img = triangulate_frame(img, temp_pts)
 
     cv.imshow("Display window", trig_img)

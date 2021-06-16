@@ -7,7 +7,7 @@ extensions = [
     Extension(
         "DelaunayDream.triangulation.triangulate",
         ["DelaunayDream/triangulation/triangulate.pyx"],
-        include_dirs=[np.get_include()],  # not needed for fftw unless it is installed in an unusual place
+        include_dirs=[np.get_include()],
     ),
 ]
 
