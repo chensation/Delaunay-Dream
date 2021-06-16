@@ -36,21 +36,27 @@ cdef delaunator_triangulate(coords):
     return np_coords[np_triangles]
 
 
-def triangulate_frame(frame, coordinates):
+def triangulate_frame(frame, coordinates, scale_factor):
 
     trig_frame = frame.copy()
 
+    height, width = frame.shape[:2]
+    small_frame = cv.resize(frame,(int(width*scale_factor), int(height*scale_factor)), interpolation = cv.INTER_AREA)
     # use trig lib here to get triangle pts
     trig_pts = delaunator_triangulate(coordinates)
     trig_pts = trig_pts.reshape((-1, 3, 1, 2))
 
     for triangle in trig_pts:  # let's parallelize this for loop
-        mask = np.zeros(trig_frame.shape[:2], np.uint8)
-        cv.fillPoly(mask, [triangle], (255, 255, 255))
 
-        # the bottleneck point: 1.6 second for 2000 triangles, 50%-60% of runtime without the cpp lib
+        small_triangle = np.multiply(triangle, scale_factor).astype(int)
+        mask = np.zeros(small_frame.shape[:2], np.uint8)
+        cv.fillPoly(mask, [small_triangle], (255, 255, 255))
+
+        # the bottleneck point:
+        # 3 second for 4000 triangles, 80-90% of runtime pre downscale
+        # 0.03 second after downscale by 0.1
         # mean_color = cv.mean(trig_frame, mask)
-        mean_color = mean(trig_frame, mask)
+        mean_color = mean(small_frame, mask)
 
         # cv.polylines(trig_frame, [triangle], isClosed=True, color=(255, 255, 255), thickness=2)
         cv.fillPoly(trig_frame, [triangle], mean_color)

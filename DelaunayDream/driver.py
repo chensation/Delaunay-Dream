@@ -7,11 +7,11 @@ import sys
 
 def main():
 
-    img = cv.imread("triangulation/sample.jpg")
+    img = cv.imread("DelaunayDream/triangulation/sample.jpg")
     if img is None:
         sys.exit("Could not read the image.")
 
-    f = open("triangulation/coords.txt", "r")
+    f = open("DelaunayDream/triangulation/coords.txt", "r")
 
     temp_pts = f.read().split(" ")
     temp_pts.pop()
@@ -19,7 +19,7 @@ def main():
 
     f.close()
 
-    trig_img = triangulate_frame(img, temp_pts)
+    trig_img = triangulate_frame(img, temp_pts, scale_factor=0.1)
 
     cv.imshow("Display window", trig_img)
     cv.waitKey(0)
