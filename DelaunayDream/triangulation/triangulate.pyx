@@ -42,7 +42,7 @@ cdef delaunator_triangulate(coords):
     return np_coords[np_triangles]
 
 
-def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False):
+def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False, thickness=1):
 
     """ triangulate a given frame with the coordinates, return the triangulated frame
 
@@ -51,6 +51,7 @@ def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False):
     :type coordinates: list
     :param scale_factor: scale the frame in order to speed up color selection, should be less than 1
     :param draw_line: draw lines between each triangle
+    :param thickness: thickness of the lines
     :return: numpy array from openCV, newly triangulated frame
     """
 
@@ -78,14 +79,13 @@ def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False):
         # the bottleneck point:
         # 3 second for 4000 triangles, 80-90% of runtime pre downscale
         # 0.03 second after downscale by 0.1
-        mean_color = cv.mean(small_frame, mask)
-
         # use this line for profiling
         # mean_color = mean(small_frame, mask)
-
-        if draw_line:
-            cv.polylines(trig_frame, [triangle], isClosed=True, color=(255, 255, 255), thickness=1)
+        mean_color = cv.mean(small_frame, mask)
 
         cv.fillPoly(trig_frame, [triangle], mean_color)
+
+        if draw_line:
+            cv.polylines(trig_frame, [triangle], isClosed=True, color=(255, 255, 255), thickness=thickness)
 
     return trig_frame

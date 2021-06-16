@@ -18,7 +18,7 @@ def main():
 
     f.close()
 
-    trig_img = triangulate_frame(img, temp_pts, scale_factor=0.1)
+    trig_img = triangulate_frame(img, temp_pts, scale_factor=0.1, draw_line=True)
 
     cv.imshow("Display window", trig_img)
     cv.waitKey(0)
