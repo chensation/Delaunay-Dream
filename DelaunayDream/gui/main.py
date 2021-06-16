@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys, cv2
+import pipe
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -263,6 +264,12 @@ class Ui_MainWindow(object):
         self.triangulation_check_box.toggled['bool'].connect(self.apply_changes_button.setChecked)
         self.playback_slider.valueChanged['int'].connect(self.video.setNum)
         self.pause_button.clicked.connect(self.stopVideo)
+        """ test apply & export
+        """
+        self.apply_changes_button.clicked.connect(self.test_apply)
+        self.export_button.clicked.connect(self.test_export)
+        """ Play video
+        """
         self.play_button.clicked.connect(self.playVideo)
         self.stop_button.clicked.connect(self.stopVideo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -304,14 +311,24 @@ class Ui_MainWindow(object):
         self.actionSave_As.setText(_translate("MainWindow", "Save As..."))
         self.actionNew.setText(_translate("MainWindow", "New"))
         self.actionNew_Window.setText(_translate("MainWindow", "New Window"))
-
+        """ variables
+        """
         self.filename = None # Will hold the image address location
         self.stop = False
+        self.original_frames = []
+        self.filtered_frames = []
+        self.curr_frame = None
+        self.video_fps = 0
+        self.video_size = ()
+        self.fourcc = None
     
     # def test(self, testing):
     #     print(testing)
 
     def playVideo(self):
+        """ currently play video from start when clicked,
+            need modification to allow pause/continue
+        """
         self.stop = False
         
         if self.filename != None:
@@ -321,13 +338,11 @@ class Ui_MainWindow(object):
             while(vid.isOpened()):
                 ret, frame = vid.read()
                 if ret:
-                    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    to_qt = QImage(image, image.shape[1], image.shape[0], QImage.Format_RGB888)
-                    pic = to_qt.scaled(854, 480, Qt.KeepAspectRatio)
-                    self.video.setPixmap(QtGui.QPixmap.fromImage(pic))
+                    qt_frame = self.set_frame(frame)
+                    self.video.setPixmap(QtGui.QPixmap.fromImage(qt_frame))
                 cv2.waitKey(25)    #25 = time of each frame in ms
                 if self.stop == True:
-                    self.video.setPixmap(QtGui.QPixmap(".\\image.jpg"))
+                    self.video.setPixmap(QtGui.QPixmap(self.curr_frame)) # stop at current frame
                     break
 
             vid.release()
@@ -336,7 +351,31 @@ class Ui_MainWindow(object):
         self.stop = True
     
     def loadVideo(self):
+        """ load up the video,
+            save all frames to original_frames list
+        """
         self.filename = QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
+        self.original_frames, self.fourcc, self.video_fps, self.video_size = pipe.get_frames(self.filename)
+
+
+    def set_frame(self,img):
+        """ Convert img to Qt format,
+            set the current frame, also return the frame
+        """
+        image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        to_qt = QImage(image, image.shape[1], image.shape[0], QImage.Format_RGB888)
+        pic = to_qt.scaled(854, 480, Qt.KeepAspectRatio)
+        self.curr_frame = pic
+        return pic
+    def test_apply(self):
+        for frame in self.original_frames:
+            new_frame = pipe.apply_filter(frame)
+            self.filtered_frames.append(new_frame)
+        print("Gray finished")
+    
+    def test_export(self):
+        pipe.generate_gray(self.filtered_frames,self.fourcc, self.video_fps, self.video_size)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

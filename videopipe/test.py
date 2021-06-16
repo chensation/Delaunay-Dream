@@ -1,4 +1,4 @@
-from Pipe import get_frames, apply_filter, generate_gray
+from pipe import get_frames, apply_filter, generate_gray
 import cv2 as cv
 
 def main():
