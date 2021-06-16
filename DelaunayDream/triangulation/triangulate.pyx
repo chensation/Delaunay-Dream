@@ -83,9 +83,10 @@ def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False, thick
         # mean_color = mean(small_frame, mask)
         mean_color = cv.mean(small_frame, mask)
 
-        cv.fillPoly(trig_frame, [triangle], mean_color)
+        cv.fillPoly(trig_frame, [triangle], mean_color, lineType=cv.LINE_AA)
 
         if draw_line:
-            cv.polylines(trig_frame, [triangle], isClosed=True, color=(255, 255, 255), thickness=thickness)
+            cv.polylines(trig_frame, [triangle], isClosed=True, color=(255, 255, 255),
+                         thickness=thickness, lineType=cv.LINE_AA)
 
     return trig_frame
