@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main.ui'
+# Form implementation generated from reading ui file '.\dream.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -16,12 +16,12 @@ import sys, cv2
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1200, 625)
+        MainWindow.resize(1195, 625)
         font = QtGui.QFont()
         font.setPointSize(11)
         MainWindow.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("film.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(".\\film.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setToolTip("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -45,8 +45,7 @@ class Ui_MainWindow(object):
         self.video = QtWidgets.QLabel(self.layoutWidget)
         self.video.setStyleSheet("background-color: rgb(0, 0, 0);")
         self.video.setText("")
-        self.video.setPixmap(QtGui.QPixmap("image.jpg"))
-        self.video.setScaledContents(True)
+        self.video.setPixmap(QtGui.QPixmap(".\\image.jpg"))
         self.video.setObjectName("video")
         self.video_playback_layout.addWidget(self.video)
         self.playback_slider = QtWidgets.QSlider(self.layoutWidget)
@@ -99,7 +98,7 @@ class Ui_MainWindow(object):
         self.triangulation_check_box.setIconSize(QtCore.QSize(16, 16))
         self.triangulation_check_box.setTristate(False)
         self.triangulation_check_box.setObjectName("triangulation_check_box")
-        self.side_panel_layout.addWidget(self.triangulation_check_box, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
+        self.side_panel_layout.addWidget(self.triangulation_check_box)
         spacerItem5 = QtWidgets.QSpacerItem(228, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.side_panel_layout.addItem(spacerItem5)
         self.frame_rate_label = QtWidgets.QLabel(self.layoutWidget)
@@ -108,7 +107,7 @@ class Ui_MainWindow(object):
         font.setPointSize(13)
         self.frame_rate_label.setFont(font)
         self.frame_rate_label.setObjectName("frame_rate_label")
-        self.side_panel_layout.addWidget(self.frame_rate_label, 0, QtCore.Qt.AlignVCenter)
+        self.side_panel_layout.addWidget(self.frame_rate_label)
         self.frame_rate_layout = QtWidgets.QHBoxLayout()
         self.frame_rate_layout.setObjectName("frame_rate_layout")
         self.frame_rate_slider = QtWidgets.QSlider(self.layoutWidget)
@@ -134,7 +133,7 @@ class Ui_MainWindow(object):
         font.setPointSize(13)
         self.hue_Label.setFont(font)
         self.hue_Label.setObjectName("hue_Label")
-        self.side_panel_layout.addWidget(self.hue_Label, 0, QtCore.Qt.AlignVCenter)
+        self.side_panel_layout.addWidget(self.hue_Label)
         self.hue_layout = QtWidgets.QHBoxLayout()
         self.hue_layout.setObjectName("hue_layout")
         self.hue_slider = QtWidgets.QSlider(self.layoutWidget)
@@ -160,7 +159,7 @@ class Ui_MainWindow(object):
         font.setPointSize(13)
         self.saturation_label.setFont(font)
         self.saturation_label.setObjectName("saturation_label")
-        self.side_panel_layout.addWidget(self.saturation_label, 0, QtCore.Qt.AlignVCenter)
+        self.side_panel_layout.addWidget(self.saturation_label)
         self.saturation_layout = QtWidgets.QHBoxLayout()
         self.saturation_layout.setObjectName("saturation_layout")
         self.saturation_slider = QtWidgets.QSlider(self.layoutWidget)
@@ -185,7 +184,7 @@ class Ui_MainWindow(object):
         font.setPointSize(13)
         self.brightness_label.setFont(font)
         self.brightness_label.setObjectName("brightness_label")
-        self.side_panel_layout.addWidget(self.brightness_label, 0, QtCore.Qt.AlignVCenter)
+        self.side_panel_layout.addWidget(self.brightness_label)
         self.brightness_layout = QtWidgets.QHBoxLayout()
         self.brightness_layout.setObjectName("brightness_layout")
         self.brightness_slider = QtWidgets.QSlider(self.layoutWidget)
@@ -204,31 +203,35 @@ class Ui_MainWindow(object):
         self.side_panel_layout.addLayout(self.brightness_layout)
         spacerItem9 = QtWidgets.QSpacerItem(228, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.side_panel_layout.addItem(spacerItem9)
+        spacerItem10 = QtWidgets.QSpacerItem(228, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.side_panel_layout.addItem(spacerItem10)
         self.apply_changes_button = QtWidgets.QPushButton(self.layoutWidget)
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(13)
         self.apply_changes_button.setFont(font)
         self.apply_changes_button.setObjectName("apply_changes_button")
-        self.side_panel_layout.addWidget(self.apply_changes_button, 0, QtCore.Qt.AlignVCenter)
-        spacerItem10 = QtWidgets.QSpacerItem(228, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.side_panel_layout.addItem(spacerItem10)
+        self.side_panel_layout.addWidget(self.apply_changes_button)
+        spacerItem11 = QtWidgets.QSpacerItem(228, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.side_panel_layout.addItem(spacerItem11)
+        spacerItem12 = QtWidgets.QSpacerItem(228, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.side_panel_layout.addItem(spacerItem12)
         self.open_export_layout = QtWidgets.QHBoxLayout()
         self.open_export_layout.setObjectName("open_export_layout")
         self.open_button = QtWidgets.QPushButton(self.layoutWidget)
         self.open_button.setObjectName("open_button")
-        self.open_export_layout.addWidget(self.open_button, 0, QtCore.Qt.AlignVCenter)
+        self.open_export_layout.addWidget(self.open_button)
         self.export_button = QtWidgets.QPushButton(self.layoutWidget)
         self.export_button.setObjectName("export_button")
-        self.open_export_layout.addWidget(self.export_button, 0, QtCore.Qt.AlignVCenter)
+        self.open_export_layout.addWidget(self.export_button)
         self.side_panel_layout.addLayout(self.open_export_layout)
         self.horizontalLayout_8.addLayout(self.side_panel_layout)
         self.horizontalLayout_9.addLayout(self.horizontalLayout_8)
-        spacerItem11 = QtWidgets.QSpacerItem(20, 538, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.horizontalLayout_9.addItem(spacerItem11)
+        spacerItem13 = QtWidgets.QSpacerItem(20, 538, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.horizontalLayout_9.addItem(spacerItem13)
         self.verticalLayout.addLayout(self.horizontalLayout_9)
-        spacerItem12 = QtWidgets.QSpacerItem(1058, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.verticalLayout.addItem(spacerItem12)
+        spacerItem14 = QtWidgets.QSpacerItem(1058, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.verticalLayout.addItem(spacerItem14)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -324,7 +327,7 @@ class Ui_MainWindow(object):
                     self.video.setPixmap(QtGui.QPixmap.fromImage(pic))
                 cv2.waitKey(25)    #25 = time of each frame in ms
                 if self.stop == True:
-                    self.video.setPixmap(QtGui.QPixmap("image.jpg"))
+                    self.video.setPixmap(QtGui.QPixmap(".\\image.jpg"))
                     break
 
             vid.release()
@@ -336,9 +339,8 @@ class Ui_MainWindow(object):
         self.filename = QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow(
+    MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
