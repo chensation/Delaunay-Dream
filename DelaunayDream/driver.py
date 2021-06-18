@@ -2,6 +2,7 @@
 # from DelaunayDream.testee.test import plzexport
 from DelaunayDream.triangulation.triangulate import triangulate_frame
 import cv2 as cv
+import numpy as np
 import sys
 
 
@@ -18,7 +19,8 @@ def main():
 
     f.close()
 
-    trig_img = triangulate_frame(img, temp_pts, scale_factor=0.1, draw_line=True)
+    temp_pts = np.array(temp_pts, dtype=int)
+    trig_img = triangulate_frame(img, temp_pts, scale_factor=0.1)
 
     cv.imshow("Display window", trig_img)
     cv.waitKey(0)

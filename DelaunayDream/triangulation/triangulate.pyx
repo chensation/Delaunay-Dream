@@ -22,24 +22,28 @@ cdef extern from "lib/delaunator.hpp" namespace "delaunator":
 
 
 # little to no impact on performance
-cdef delaunator_triangulate(coords):
+# @cython.profile(True)
+cdef delaunator_triangulate(np.ndarray[np.int_t] coords):
 
-    # cast to cpp vector and call cpp library
-    cdef vector[double] coords_vec = coords
+    # cast to cpp vector
+    cdef long[::1] coords_arr = coords
+    cdef vector[double] coords_vec
+
+    cdef int size = coords_arr.shape[0]
+    for i in range(size):
+        coords_vec.push_back(coords_arr[i])
+
     cdef Delaunator* d = new Delaunator(coords_vec)
 
-    # redefine the vector to be an array
+    # convert triangle to a numpy array
     cdef size_t[::1] arr_triangles = <size_t [:d.triangles.size()]>d.triangles.data()
-
-    # redefine them to be numpy arrays
-    np_coords = np.asarray(coords)
-    np_triangles = np.asarray(arr_triangles)
+    cdef np.ndarray np_triangles = np.asarray(arr_triangles)
 
     # group the x and y coordinates together
-    np_coords = np_coords.reshape((-1, 2))
+    cdef np.ndarray tri_coords = coords.reshape((-1, 2))
 
-    # sort the return the coordinates
-    return np_coords[np_triangles]
+    # sort then return the coordinates
+    return tri_coords[np_triangles]
 
 
 def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False, thickness=1):
@@ -48,7 +52,7 @@ def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False, thick
 
     :param frame: numpy array from openCV, a frame from the video
     :param coordinates: the coordinates to triangulate with
-    :type coordinates: list
+    :type coordinates: np.ndarray
     :param scale_factor: scale the frame in order to speed up color selection, should be less than 1
     :param draw_line: draw lines between each triangle
     :param thickness: thickness of the lines
@@ -61,13 +65,10 @@ def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False, thick
     # downscale frame for faster color selection
     small_frame = cv.resize(frame,(int(width*scale_factor), int(height*scale_factor)), interpolation = cv.INTER_AREA)
 
-    # add the edges of the frame in so the entire frame can be triangulated
-    coordinates += (0, 0, 0, height, width, 0, width, height)
-
     # use trig lib here to get triangle pts
     trig_pts = delaunator_triangulate(coordinates)
 
-    # reshape 1D array to be array of triangles, each contain 3 xy pairs
+    # reshape 2D array to be array of triangles, each contain 3 xy pairs
     trig_pts = trig_pts.reshape((-1, 3, 1, 2))
 
     for triangle in trig_pts:
