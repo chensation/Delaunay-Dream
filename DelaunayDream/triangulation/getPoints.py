@@ -1,6 +1,7 @@
 import time
 import numpy as np
 from numpy.random import randint, choice
+import cv2 as cv
 
 def generate_sample_points(img, max_points, threshold):
     # Threshold (type: float) is the threshold above which points should be sampled for triangulation.
@@ -29,3 +30,11 @@ def threshold_sample(n, weights, threshold):
                          f"Only {candidates.shape[0]} available.")
 
     return candidates[choice(candidates.shape[0], size=n, replace=False)]
+
+def approx_canny(img):
+    v = np.median(img)
+    lower = int(max(0,(1.0 - 0.33) * v))
+    upper = int(min(255, (1.0 + 0.33) * v))
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    canny = cv.Canny(img, lower, upper)
+    return canny
