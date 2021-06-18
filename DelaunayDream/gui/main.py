@@ -12,7 +12,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys, cv2
-import pipe
+import sys
+sys.path.append('../')
+#import pipe
+from videopipe import pipe
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
