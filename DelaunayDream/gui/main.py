@@ -330,22 +330,36 @@ class Ui_MainWindow(object):
             need modification to allow pause/continue
         """
         self.stop = False
+        index = 0
         
-        if self.filename != None:
-            vid = cv2.VideoCapture(self.filename)
-            fps = vid.get(cv2.CAP_PROP_FPS)
-            print(fps)
-            while(vid.isOpened()):
-                ret, frame = vid.read()
-                if ret:
-                    qt_frame = self.set_frame(frame)
-                    self.video.setPixmap(QtGui.QPixmap.fromImage(qt_frame))
-                cv2.waitKey(25)    #25 = time of each frame in ms
-                if self.stop == True:
-                    self.video.setPixmap(QtGui.QPixmap(self.curr_frame)) # stop at current frame
-                    break
+        # if self.filename != None:
+        #     vid = cv2.VideoCapture(self.filename)
+        #     fps = vid.get(cv2.CAP_PROP_FPS)
+        #     print(fps)
+        #     while(vid.isOpened()):
+        #         ret, frame = vid.read()
+        #         if ret:
+        #             qt_frame = self.set_frame(frame)
+        #             self.video.setPixmap(QtGui.QPixmap.fromImage(qt_frame))
+        #         cv2.waitKey(25)    #25 = time of each frame in ms
+        #         if self.stop == True:
+        #             self.video.setPixmap(QtGui.QPixmap(".\\image.jpg"))
+        #             break
 
-            vid.release()
+        #     vid.release()
+
+
+
+        #Testing play video from list of frames
+        while index < len(self.original_frames):
+            qt_frame = self.set_frame(self.original_frames[index])
+            self.video.setPixmap(QtGui.QPixmap.fromImage(qt_frame))
+            cv2.waitKey(25)
+            if self.stop:
+                self.video.setPixmap(QtGui.QPixmap(".\\image.jpg"))
+                break
+            index +=1
+
 
     def stopVideo(self):
         self.stop = True

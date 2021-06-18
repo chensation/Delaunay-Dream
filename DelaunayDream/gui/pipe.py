@@ -32,7 +32,7 @@ def get_frames(filename):
 
 
 def apply_filter(frame):
-    """ Apply pre-filter here
+    """ TODO:Apply pre-filter here
     """
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)# for testing
     return gray
