@@ -19,7 +19,7 @@ setup(
     author="princess",
     include_package_data=True,
     ext_modules=cythonize(extensions),
-    # install_requires = [], # Make sure to add the libraries we use here.
+    install_requires = ["Cython", "numpy", "opencv-python"], # Make sure to add the libraries we use here.
     entry_points={
             "console_scripts":[
                 "plzrun = DelaunayDream.testee.deep.gem:main",
