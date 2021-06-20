@@ -24,7 +24,8 @@ setup(
             "console_scripts":[
                 "plzrun = DelaunayDream.testee.deep.gem:main",
                 "plzrun1 = DelaunayDream.testee.test:main",
-                "trigtest = DelaunayDream.driver:main"
+                "trigtest = DelaunayDream.driver:main",
+                "filtertest = DelaunayDream.webCamFilterDemo:main"
             ]
     }
 

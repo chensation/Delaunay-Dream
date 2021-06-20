@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from filters import applyFilters
+from DelaunayDream import filters
 
 def nothing(b):
     if False:
@@ -22,7 +22,7 @@ def main():
 
         _, rawFrame = cap.read()
 
-        res = applyFilters(britVal, satVal, hueVal, rawFrame)
+        res = filters.applyFilters(britVal, satVal, hueVal, rawFrame)
 
         cv2.imshow("original", rawFrame)
         cv2.imshow('image', res)
