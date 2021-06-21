@@ -32,9 +32,11 @@ def threshold_sample(n, weights, threshold):
     return candidates[choice(candidates.shape[0], size=n, replace=False)]
 
 def approx_canny(img):
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     v = np.median(img)
+    v_alt = np.median(gray)
     lower = int(max(0,(1.0 - 0.33) * v))
     upper = int(min(255, (1.0 + 0.33) * v))
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    canny = cv.Canny(img, lower, upper)
+    #canny = cv.Canny(img, lower, upper)
+    canny = cv.Canny(gray, lower, upper)
     return canny
