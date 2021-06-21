@@ -8,7 +8,7 @@ import sys
 
 
 def main():
-    img = cv.imread("triangulation/m.jpg")
+    img = cv.imread("triangulation/test.jpg")
     if img is None:
         sys.exit("Could not read the image.")
 
@@ -19,7 +19,7 @@ def main():
     # f.close()
     # temp_pts = np.array(temp_pts, dtype=int)
 
-    sample_pts = generate_sample_points(img, 2000, 0)
+    sample_pts = generate_sample_points(img, 5000, 0)
 
     test_pts = sample_pts.reshape((-1, 2))
     for pt in test_pts:
