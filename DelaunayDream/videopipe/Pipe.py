@@ -1,6 +1,8 @@
 import cv2 as cv
 import os
 import sys
+from DelaunayDream.triangulation.triangulate import triangulate_frame
+from DelaunayDream.triangulation.get_points import generate_sample_points
 import numpy as np
 
 def get_frames(filename):
@@ -37,15 +39,14 @@ def apply_filter(frame):
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)# for testing
     return gray
 
-def frame_processing(frame_list):
-    processed_frames = []
-    return processed_frames
-
+def frame_processing(frame,max_pt = 2000, threshold = 10):
+    pts = generate_sample_points(frame, max_pt, threshold)
+    return pts
 
     
-def apply_triangulation(frames):
-    triangulated_frames=[]
-    return triangulated_frames
+def apply_triangulation(frame,pts, factor = 1):
+    result = triangulate_frame(frame,pts, factor)
+    return result
 
 def generate_gray(frames,fourcc,fps,size):
     out_gray = cv.VideoWriter('sampleout1.avi',fourcc,fps,size,False)
