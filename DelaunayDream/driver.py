@@ -19,13 +19,14 @@ def main():
     # f.close()
     # temp_pts = np.array(temp_pts, dtype=int)
 
-    sample_pts = generate_sample_points(img, 2000, 0)
+    sample_pts = generate_sample_points(img, 2000, 10)
 
     test_pts = sample_pts.reshape((-1, 2))
+    test_img = img.copy()
     for pt in test_pts:
-        cv.circle(img, tuple(pt), 1, (0, 0, 255))
+        cv.circle(test_img, tuple(pt), 1, (0, 0, 255))
 
-    cv.imshow("Display window", img)
+    cv.imshow("Display window", test_img)
     cv.waitKey(0)
 
     trig_img = triangulate_frame(img, sample_pts, scale_factor=0.1)
