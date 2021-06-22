@@ -67,3 +67,6 @@ class Process:
         img = cv2.cvtColor(final_hsv,cv2.COLOR_HSV2BGR)
         return img
     
+    def changeBlur(self, img):
+        img = cv2.blur(img, (self.__frame_rate+1, self.__frame_rate+1))
+        return img
