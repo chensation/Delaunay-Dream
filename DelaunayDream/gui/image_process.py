@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'image2.ui'
+# Form implementation generated from reading ui file '.\image.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -9,9 +9,19 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from process import Process
+import sys, cv2
 
 class Ui_MainWindow(object):
+    def __init__(self):
+        self.process = Process(False,0,0,0,0)
+        self.filename = None
+        self.frame = None
+        self.original = None
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1200, 800)
@@ -19,7 +29,7 @@ class Ui_MainWindow(object):
         font.setPointSize(11)
         MainWindow.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("film.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(".\\film.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setToolTip("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -36,7 +46,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addItem(spacerItem1)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("sample_700.jpg"))
+        self.label.setPixmap(QtGui.QPixmap(".\\sample_700.jpg"))
         self.label.setObjectName("label")
         self.horizontalLayout_6.addWidget(self.label)
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -194,15 +204,34 @@ class Ui_MainWindow(object):
         self.actionNew_Window = QtWidgets.QAction(MainWindow)
         self.actionNew_Window.setObjectName("actionNew_Window")
 
+        #### WIDGET FUNCTIONS ####
         self.retranslateUi(MainWindow)
-        self.hue_slider.valueChanged['int'].connect(self.hue_spinBox.setValue)
-        self.saturation_spinBox.valueChanged['int'].connect(self.saturation_slider.setValue)
-        self.brightness_slider.valueChanged['int'].connect(self.brightness_spinBox.setValue)
-        self.saturation_slider.valueChanged['int'].connect(self.saturation_spinBox.setValue)
-        self.brightness_spinBox.valueChanged['int'].connect(self.brightness_slider.setValue)
-        self.hue_spinBox.valueChanged['int'].connect(self.hue_slider.setValue)
+
+        #frame_rate
         self.frame_rate_spinBox.valueChanged['int'].connect(self.frame_rate_slider.setValue)
         self.frame_rate_slider.valueChanged['int'].connect(self.frame_rate_spinBox.setValue)
+        self.frame_rate_slider.valueChanged['int'].connect(self.setFrameRate)
+
+        #hue
+        self.hue_slider.valueChanged['int'].connect(self.hue_spinBox.setValue)
+        self.hue_spinBox.valueChanged['int'].connect(self.hue_slider.setValue)
+        self.hue_spinBox.valueChanged['int'].connect(self.setHue)
+
+        #saturation
+        self.saturation_slider.valueChanged['int'].connect(self.saturation_spinBox.setValue)
+        self.saturation_spinBox.valueChanged['int'].connect(self.saturation_slider.setValue)
+        self.saturation_spinBox.valueChanged['int'].connect(self.setSaturation)
+
+        #brightness
+        self.brightness_slider.valueChanged['int'].connect(self.brightness_spinBox.setValue)
+        self.brightness_spinBox.valueChanged['int'].connect(self.brightness_slider.setValue)
+        self.brightness_spinBox.valueChanged['int'].connect(self.setBrightness)
+
+        #triangulate
+        self.triangulation_check_box.toggled['bool'].connect(self.setTriangulation)
+        
+        self.open_button.clicked.connect(self.loadVideo)
+        self.export_button.clicked.connect(self.exportVideo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -232,6 +261,44 @@ class Ui_MainWindow(object):
         self.actionNew.setText(_translate("MainWindow", "New"))
         self.actionNew_Window.setText(_translate("MainWindow", "New Window"))
 
+    def setTriangulation(self, triangulate):
+        self.process.triangulate = triangulate    
+    
+    def setFrameRate(self, frame_rate):
+        self.process.frame_rate = frame_rate
+        self.update()
+
+    def setHue(self, hue):
+        self.process.hue = hue
+
+    def setSaturation(self, saturation):
+        self.process.saturation = saturation
+
+    def setBrightness(self, brightness):
+        self.process.brightness = brightness
+        self.update()
+
+    def update(self):
+        image = self.process.changeBrightness(self.frame)
+        image = self.process.changeBlur(image)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        to_qt = QImage(image, image.shape[1], image.shape[0], image.strides[0], QImage.Format_RGB888)
+        pic = to_qt.scaled(700, 700, Qt.KeepAspectRatio)
+        self.label.setPixmap(QtGui.QPixmap.fromImage(pic))
+        
+    def loadVideo(self):
+        self.filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        print(self.filename)
+        if self.filename != '':
+            self.frame = cv2.imread(self.filename)
+            self.update()
+
+    def exportVideo(self):
+        output_filename = QFileDialog.getSaveFileName(filter="JPG(*.jpg);;PNG(*.png);;TIFF(*.tiff);;BMP(*.bmp)")[0]
+        if output_filename != '':    
+            image = self.process.changeBrightness(self.frame)
+            image = self.process.changeBlur(image)
+            cv2.imwrite(output_filename, image)
 
 if __name__ == "__main__":
     import sys
