@@ -35,9 +35,9 @@ class Video:
         print("All frames loaded")
 
         cap.release()
-        #cv.destroyAllWindows()
+        # cv.destroyAllWindows()
 
-    def generate_gray(self,filename):
+    def generate_gray(self, filename):
         out_gray = cv.VideoWriter(filename, self.fourcc, self.fps, self.video_size, False)
         for frame in self.result_frames:
             out_gray.write(frame)

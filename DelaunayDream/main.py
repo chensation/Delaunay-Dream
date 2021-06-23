@@ -96,21 +96,20 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             # self.update()
             self.video.filename = filename
             self.video.get_frames()
-            
+
             self.frame = self.video.frame_list[0]
             self.update()
 
     def export_video(self):
-        #output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
-            # image = self.process.changeBrightness(self.frame)   setDefaultSuffix(".avi").
-            #image = self.process.apply_filters(self.frame)
-            #cv2.imwrite(output_filename, image)
+        # output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
+        # image = self.process.changeBrightness(self.frame)   setDefaultSuffix(".avi").
+        # image = self.process.apply_filters(self.frame)
+        # cv2.imwrite(output_filename, image)
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
         self.video.process_video(self.process.apply_filters, True)
         if self.process.triangulate:
             self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
         self.video.generate_color(output_filename + extension)
-        
 
 
 def main():
