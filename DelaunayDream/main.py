@@ -89,11 +89,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def load_video(self):
         filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
-        self.have_file = True
-        print(filename)
-        if self.have_file:
+        if filename != '':
+            print("reading from: ", filename)
             # self.frame = cv2.imread(self.filename)
             # self.update()
+            self.have_file = True
             self.video.filename = filename
             self.video.get_frames()
 
@@ -106,10 +106,13 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # image = self.process.apply_filters(self.frame)
         # cv2.imwrite(output_filename, image)
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
-        self.video.process_video(self.process.apply_filters, True)
-        if self.process.triangulate:
-            self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
-        self.video.generate_color(output_filename + extension)
+        if output_filename != '':
+            print("writing to: ", output_filename + extension)
+
+            self.video.process_video(self.process.apply_filters, True)
+            if self.process.triangulate:
+                self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
+            self.video.generate_color(output_filename + extension)
 
 
 def main():
