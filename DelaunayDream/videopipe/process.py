@@ -1,22 +1,21 @@
 import cv2
 import numpy as np
 
+
+def rotate_hue(val, deg):
+    return (val + deg) % 180
+
+
 class Process:
-    def __init__(self, triangulate, frame_rate, hue, saturation, brightness):
+
+    def __init__(self, triangulate=False, frame_rate=0, hue=0, saturation=1, brightness=1):
         self.__triangulate = triangulate
         self.__frame_rate = frame_rate
         self.__hue = hue
         self.__saturation = saturation
         self.__brightness = brightness
-    
-    def __init__(self):
-        self.__triangulate = False
-        self.__frame_rate = 0
-        self.__hue = 0
-        self.__saturation = 1
-        self.__brightness = 1
 
-    #Triangulate
+    # Triangulate
     @property
     def triangulate(self):
         return self.__triangulate
@@ -25,7 +24,7 @@ class Process:
     def triangulate(self, triangulate):
         self.__triangulate = triangulate
 
-    #Frame Rate
+    # Frame Rate
     @property
     def frame_rate(self):
         return self.__frame_rate
@@ -34,7 +33,7 @@ class Process:
     def frame_rate(self, frame_rate):
         self.__frame_rate = frame_rate
 
-    #Hue
+    # Hue
     @property
     def hue(self):
         return self.__hue
@@ -43,57 +42,55 @@ class Process:
     def hue(self, hue):
         self.__hue = hue
 
-    #Saturation
+    # Saturation
     @property
     def saturation(self):
         return self.__saturation
 
     @saturation.setter
     def saturation(self, saturation):
-        self.__saturation = saturation/100
+        self.__saturation = saturation / 100
 
-    #Brightness
+    # Brightness
     @property
     def brightness(self):
         return self.__brightness
 
     @brightness.setter
     def brightness(self, brightness):
-        self.__brightness = brightness/100
+        self.__brightness = brightness / 100
 
-    #Filter Functions
-    def applyFilters(self, bgrFrame):
-        hsvFrame = cv2.cvtColor(bgrFrame, cv2.COLOR_BGR2HSV)
-        hsvFrame = np.array(hsvFrame, dtype=np.float64)
+    # Filter Functions
+    def apply_filters(self, bgr_frame):
+        hsv_frame = cv2.cvtColor(bgr_frame, cv2.COLOR_BGR2HSV)
+        hsv_frame = np.array(hsv_frame, dtype=np.float64)
 
-        hsvFrame = self.hueFilter(hsvFrame)
-        hsvFrame = self.saturationFilter(hsvFrame)
-        hsvFrame = self.brightnessFilter(hsvFrame)
+        hsv_frame = self.change_blur(hsv_frame)
+        hsv_frame = self.hue_filter(hsv_frame)
+        hsv_frame = self.saturation_filter(hsv_frame)
+        hsv_frame = self.brightness_filter(hsv_frame)
 
-        hsvFrame = np.array(hsvFrame, dtype=np.uint8)
-        outFrame = cv2.cvtColor(hsvFrame, cv2.COLOR_HSV2BGR)
-        return outFrame
+        hsv_frame = np.array(hsv_frame, dtype=np.uint8)
+        out_frame = cv2.cvtColor(hsv_frame, cv2.COLOR_HSV2BGR)
+        return out_frame
 
-    def changeBlur(self, img):
-        img = cv2.blur(img, (self.__frame_rate+1, self.__frame_rate+1))
+    def change_blur(self, img):
+        img = cv2.blur(img, (self.__frame_rate + 1, self.__frame_rate + 1))
         return img
 
-    def hueFilter(self, hsvFrame):
+    def hue_filter(self, hsv_frame):
         # scale pixel values up or down for channel 0(Hue)
-        hsvFrame[:, :, 0] = self.rotateHue(hsvFrame[:, :, 0], self.__hue)
-        return hsvFrame
+        hsv_frame[:, :, 0] = rotate_hue(hsv_frame[:, :, 0], self.__hue)
+        return hsv_frame
 
-    def saturationFilter(self, hsvFrame):
+    def saturation_filter(self, hsv_frame):
         # scale pixel values up or down for channel 1(Saturation)
-        hsvFrame[:, :, 1] = hsvFrame[:, :, 1] * self.__saturation
-        hsvFrame[:, :, 1][hsvFrame[:, :, 1] > 255] = 255  # setting values > 255 to 255.
-        return hsvFrame
+        hsv_frame[:, :, 1] = hsv_frame[:, :, 1] * self.__saturation
+        hsv_frame[:, :, 1][hsv_frame[:, :, 1] > 255] = 255  # setting values > 255 to 255.
+        return hsv_frame
 
-    def brightnessFilter(self, hsvFrame):
+    def brightness_filter(self, hsv_frame):
         # scale pixel values up or down for channel 2(Value)
-        hsvFrame[:, :, 2] = hsvFrame[:, :, 2] * self.__brightness
-        hsvFrame[:, :, 2][hsvFrame[:, :, 2] > 255] = 255  # setting values > 255 to 255.
-        return hsvFrame
-
-    def rotateHue(self, val, deg):
-        return (val + deg)%180
+        hsv_frame[:, :, 2] = hsv_frame[:, :, 2] * self.__brightness
+        hsv_frame[:, :, 2][hsv_frame[:, :, 2] > 255] = 255  # setting values > 255 to 255.
+        return hsv_frame
