@@ -4,8 +4,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from DelaunayDream.gui.gui import Ui_MainWindow
-from DelaunayDream.triangulation.get_points import generate_sample_points
-from DelaunayDream.triangulation.triangulate import triangulate_frame
+from DelaunayDream.triangulation.triangulation import Triangulation
 from DelaunayDream.videopipe.video import Video
 from DelaunayDream.videopipe.process import Process
 
@@ -15,6 +14,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         self.process = Process()
+        self.triangulation = Triangulation(image_scale=0.1)
         self.filename = ''
         self.frame = None
         self.original = None
@@ -51,6 +51,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def set_triangulation(self, triangulate):
         self.process.triangulate = triangulate
+        if self.filename != '':
+            self.update()
 
     def set_frame_rate(self, frame_rate):
         self.process.frame_rate = frame_rate
@@ -75,6 +77,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def update(self):
 
         image = self.process.apply_filters(self.frame)
+
+        if self.process.triangulate:
+            image = self.triangulation.apply_triangulation(image)
+
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
         pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
