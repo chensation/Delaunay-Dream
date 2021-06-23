@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
     ext_modules=cythonize(extensions),
     # Make sure to add the libraries we use here.
-    install_requires=["Cython", "numpy", "opencv-python-headless", "PyQt5"],
+    install_requires=["numpy", "opencv-python-headless", "PyQt5"],
     entry_points={
         "console_scripts": [
             "delaunaydream = DelaunayDream.main:main",
