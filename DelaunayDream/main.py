@@ -2,9 +2,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from process import Process
+from DelaunayDream.triangulation.triangulate import triangulate_frame
+from DelaunayDream.triangulation.get_points import generate_sample_points
+
+from DelaunayDream.videopipe.Video import Video
+from DelaunayDream.videopipe.process import Process
 import sys, cv2
-from gui import Ui_MainWindow
+from DelaunayDream.gui.gui import Ui_MainWindow
 
 class GUI_Window(Ui_MainWindow, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
