@@ -15,9 +15,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.setupUi(self)
         self.process = Process()
         self.triangulation = Triangulation(image_scale=0.1)
-        self.filename = ''
+        self.have_file = False
         self.frame = None
         self.original = None
+        self.video = Video()
 
         # WIDGET FUNCTIONS
         self.retranslateUi(self)
@@ -51,27 +52,27 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def set_triangulation(self, triangulate):
         self.process.triangulate = triangulate
-        if self.filename != '':
+        if self.have_file:
             self.update()
 
     def set_frame_rate(self, frame_rate):
         self.process.frame_rate = frame_rate
-        if self.filename != '':
+        if self.have_file:
             self.update()
 
     def set_hue(self, hue):
         self.process.hue = hue
-        if self.filename != '':
+        if self.have_file:
             self.update()
 
     def set_saturation(self, saturation):
         self.process.saturation = saturation
-        if self.filename != '':
+        if self.have_file:
             self.update()
 
     def set_brightness(self, brightness):
         self.process.brightness = brightness
-        if self.filename != '':
+        if self.have_file:
             self.update()
 
     def update(self):
@@ -87,18 +88,29 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label.setPixmap(QtGui.QPixmap.fromImage(pic))
 
     def load_video(self):
-        self.filename = QtWidgets.QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
-        print(self.filename)
-        if self.filename != '':
-            self.frame = cv2.imread(self.filename)
+        filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
+        self.have_file = True
+        print(filename)
+        if self.have_file:
+            # self.frame = cv2.imread(self.filename)
+            # self.update()
+            self.video.filename = filename
+            self.video.get_frames()
+            
+            self.frame = self.video.frame_list[0]
             self.update()
 
     def export_video(self):
-        output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="JPG(*.jpg);;PNG(*.png);;TIFF(*.tiff);;BMP(*.bmp)")[0]
-        if output_filename != '':
-            # image = self.process.changeBrightness(self.frame)
-            image = self.process.apply_filters(self.frame)
-            cv2.imwrite(output_filename, image)
+        #output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
+            # image = self.process.changeBrightness(self.frame)   setDefaultSuffix(".avi").
+            #image = self.process.apply_filters(self.frame)
+            #cv2.imwrite(output_filename, image)
+        output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
+        self.video.process_video(self.process.apply_filters, True)
+        if self.process.triangulate:
+            self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
+        self.video.generate_color(output_filename + extension)
+        
 
 
 def main():

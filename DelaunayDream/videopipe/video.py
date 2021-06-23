@@ -28,22 +28,23 @@ class Video:
                 break
             # cv.imshow('Frame', frame)#display current frame-to be removed/modified
             self.frame_list.append(frame)
+            self.result_frames.append(0)
 
-            if cv.waitKey(20) & 0xFF == ord('d'):
-                break
+            # if cv.waitKey(20) & 0xFF == ord('d'):
+            #     break
         print("All frames loaded")
 
         cap.release()
-        cv.destroyAllWindows()
+        #cv.destroyAllWindows()
 
-    def generate_gray(self):
-        out_gray = cv.VideoWriter('sampleout1.avi', self.fourcc, self.fps, self.video_size, False)
+    def generate_gray(self,filename):
+        out_gray = cv.VideoWriter(filename, self.fourcc, self.fps, self.video_size, False)
         for frame in self.result_frames:
             out_gray.write(frame)
         print("Write finished")
 
-    def generate_color(self):
-        out_color = cv.VideoWriter('sampleout1.avi', self.fourcc, self.fps, self.video_size, True)
+    def generate_color(self, filename):
+        out_color = cv.VideoWriter(filename, self.fourcc, self.fps, self.video_size, True)
         for frame in self.result_frames:
             out_color.write(frame)
         print("Write finished")
