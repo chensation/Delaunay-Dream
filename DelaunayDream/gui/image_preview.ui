@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>800</height>
+    <width>1100</width>
+    <height>850</height>
    </rect>
   </property>
   <property name="font">
@@ -32,18 +32,12 @@
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="1" column="0" alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Image Preview</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>428</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       </widget>
       </item>
       <item row="2" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -66,7 +60,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap>sample_700.jpg</pixmap>
+           <pixmap>black.jpg</pixmap>
           </property>
          </widget>
         </item>
@@ -94,7 +88,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Blurriness</string>
+             <string>Frame Rate</string>
             </property>
            </widget>
           </item>
@@ -102,6 +96,9 @@
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
              <widget class="QSlider" name="frame_rate_slider">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="statusTip">
                <string>Adjust Frame Rate</string>
               </property>
@@ -112,6 +109,9 @@
             </item>
             <item>
              <widget class="QSpinBox" name="frame_rate_spinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Arial</family>
@@ -416,7 +416,7 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -429,10 +429,23 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0" alignment="Qt::AlignHCenter">
-       <widget class="QLabel" name="label_2">
+      <item row="0" column="0">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>428</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="status_message">
         <property name="text">
-         <string>Image Preview</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -468,246 +481,5 @@
   </action>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>hue_slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>hue_spinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1135</x>
-     <y>290</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1160</x>
-     <y>290</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>brightness_slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>brightness_spinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1135</x>
-     <y>509</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1160</x>
-     <y>509</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>brightness_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>brightness_slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1160</x>
-     <y>509</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1135</x>
-     <y>509</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>hue_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>hue_slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1160</x>
-     <y>290</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1135</x>
-     <y>290</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>frame_rate_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>frame_rate_slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1160</x>
-     <y>181</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1135</x>
-     <y>181</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>frame_rate_slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>frame_rate_spinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1135</x>
-     <y>181</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1160</x>
-     <y>181</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>triangulation_check_box</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>label</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>846</x>
-     <y>56</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>707</x>
-     <y>85</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>frame_rate_slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>807</x>
-     <y>176</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>723</x>
-     <y>176</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>hue_slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>781</x>
-     <y>278</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>654</x>
-     <y>283</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>brightness_slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>878</x>
-     <y>504</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>685</x>
-     <y>502</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>open_button</sender>
-   <signal>clicked()</signal>
-   <receiver>label</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>814</x>
-     <y>713</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>674</x>
-     <y>664</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>export_button</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>label</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1012</x>
-     <y>715</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>532</x>
-     <y>564</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>saturation_slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>812</x>
-     <y>384</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>661</x>
-     <y>381</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>saturation_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>saturation_slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1160</x>
-     <y>399</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1135</x>
-     <y>400</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>saturation_slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>saturation_spinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1135</x>
-     <y>400</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1160</x>
-     <y>399</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
