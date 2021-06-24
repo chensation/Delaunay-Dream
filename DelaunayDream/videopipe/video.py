@@ -15,6 +15,8 @@ class Video:
         """ read the video according to filename,
             return list containing all frames
         """
+        self.frame_list.clear()
+        self.result_frames.clear()
         cap = cv.VideoCapture(self.filename)
         self.fps = cap.get(cv.CAP_PROP_FPS)  # get video frame rate
         self.fourcc = cv.VideoWriter_fourcc(*'XVID')
@@ -32,8 +34,6 @@ class Video:
 
             # if cv.waitKey(20) & 0xFF == ord('d'):
             #     break
-        print("All frames loaded")
-
         cap.release()
         # cv.destroyAllWindows()
 
@@ -41,13 +41,11 @@ class Video:
         out_gray = cv.VideoWriter(filename, self.fourcc, self.fps, self.video_size, False)
         for frame in self.result_frames:
             out_gray.write(frame)
-        print("Write finished")
 
     def generate_color(self, filename):
         out_color = cv.VideoWriter(filename, self.fourcc, self.fps, self.video_size, True)
         for frame in self.result_frames:
             out_color.write(frame)
-        print("Write finished")
 
     def process_video(self, func, process_original=True, *args, **kwargs):
         if process_original:

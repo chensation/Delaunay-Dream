@@ -76,7 +76,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.update()
 
     def update(self):
-
+        self.status_message.setText('')
         image = self.process.apply_filters(self.frame)
 
         if self.process.triangulate:
@@ -88,9 +88,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label.setPixmap(QtGui.QPixmap.fromImage(pic))
 
     def load_video(self):
+        self.status_message.setText(f"reading from file")
         filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
         if filename != '':
-            print("reading from: ", filename)
             # self.frame = cv2.imread(self.filename)
             # self.update()
             self.have_file = True
@@ -99,20 +99,27 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
             self.frame = self.video.frame_list[0]
             self.update()
+            self.status_message.setText("All frames loaded")
+
+        else:
+            self.status_message.setText("")
 
     def export_video(self):
         # output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
         # image = self.process.changeBrightness(self.frame)   setDefaultSuffix(".avi").
         # image = self.process.apply_filters(self.frame)
         # cv2.imwrite(output_filename, image)
+        self.status_message.setText(f"writing to file")
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
         if output_filename != '':
-            print("writing to: ", output_filename + extension)
 
             self.video.process_video(self.process.apply_filters, True)
             if self.process.triangulate:
                 self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
             self.video.generate_color(output_filename + extension)
+            self.status_message.setText("Write finished")
+        else:
+            self.status_message.setText("")
 
 
 def main():
