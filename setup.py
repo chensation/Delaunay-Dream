@@ -14,10 +14,9 @@ extensions = [
 setup(
     name="DelaunayDream",
     version="0.0.1",
-    packages=["DelaunayDream", "DelaunayDream.testee", "DelaunayDream.gui", "DelaunayDream.triangulation",
-              "DelaunayDream.videopipe", "DelaunayDream.testee.deep"],
+    packages=["DelaunayDream", "DelaunayDream.gui", "DelaunayDream.triangulation", "DelaunayDream.videopipe"],
     url="https://github.com/chensation/Delaunay-Dream.git",
-    author="princess",
+    author="drowning_princesses",
     include_package_data=True,
     ext_modules=cythonize(extensions),
     # Make sure to add the libraries we use here.
@@ -25,10 +24,6 @@ setup(
     entry_points={
         "console_scripts": [
             "delaunaydream = DelaunayDream.main:main",
-            "plzrun = DelaunayDream.testee.deep.gem:main",
-            "plzrun1 = DelaunayDream.testee.test:main",
-            "trigtest = DelaunayDream.driver:main",
-            "filtertest = DelaunayDream.webCamFilterDemo:main"
         ]
     }
 
