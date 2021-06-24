@@ -65,7 +65,6 @@ class Process:
         hsv_frame = cv2.cvtColor(bgr_frame, cv2.COLOR_BGR2HSV)
         hsv_frame = np.array(hsv_frame, dtype=np.float64)
 
-        hsv_frame = self.change_blur(hsv_frame)
         hsv_frame = self.hue_filter(hsv_frame)
         hsv_frame = self.saturation_filter(hsv_frame)
         hsv_frame = self.brightness_filter(hsv_frame)
@@ -73,10 +72,6 @@ class Process:
         hsv_frame = np.array(hsv_frame, dtype=np.uint8)
         out_frame = cv2.cvtColor(hsv_frame, cv2.COLOR_HSV2BGR)
         return out_frame
-
-    def change_blur(self, img):
-        img = cv2.blur(img, (self.__frame_rate + 1, self.__frame_rate + 1))
-        return img
 
     def hue_filter(self, hsv_frame):
         # scale pixel values up or down for channel 0(Hue)
