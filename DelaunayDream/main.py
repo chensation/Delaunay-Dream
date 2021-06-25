@@ -20,35 +20,14 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.original = None
         self.video = Video()
 
-        # WIDGET FUNCTIONS
-        self.retranslateUi(self)
-
-        # frame_rate
-        self.frame_rate_spinBox.valueChanged['int'].connect(self.frame_rate_slider.setValue)
-        self.frame_rate_slider.valueChanged['int'].connect(self.frame_rate_spinBox.setValue)
         self.frame_rate_slider.valueChanged['int'].connect(self.set_frame_rate)
-
-        # hue
-        self.hue_slider.valueChanged['int'].connect(self.hue_spinBox.setValue)
-        self.hue_spinBox.valueChanged['int'].connect(self.hue_slider.setValue)
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
-
-        # saturation
-        self.saturation_slider.valueChanged['int'].connect(self.saturation_spinBox.setValue)
-        self.saturation_spinBox.valueChanged['int'].connect(self.saturation_slider.setValue)
         self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
-
-        # brightness
-        self.brightness_slider.valueChanged['int'].connect(self.brightness_spinBox.setValue)
-        self.brightness_spinBox.valueChanged['int'].connect(self.brightness_slider.setValue)
         self.brightness_spinBox.valueChanged['int'].connect(self.set_brightness)
-
-        # triangulate
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
 
         self.open_button.clicked.connect(self.load_video)
         self.export_button.clicked.connect(self.export_video)
-        QtCore.QMetaObject.connectSlotsByName(self)
 
     def set_triangulation(self, triangulate):
         self.process.triangulate = triangulate
@@ -85,10 +64,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
         pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
-        self.label.setPixmap(QtGui.QPixmap.fromImage(pic))
+        self.image_preview.setPixmap(QtGui.QPixmap.fromImage(pic))
 
     def load_video(self):
-        self.status_message.setText(f"reading from file")
+        self.status_message.setText(f"reading from file...give it some time")
         filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
         if filename != '':
             # self.frame = cv2.imread(self.filename)
@@ -99,7 +78,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
             self.frame = self.video.frame_list[0]
             self.update()
-            self.status_message.setText("All frames loaded")
+            self.status_message.setText("All frames loaded and ready")
 
         else:
             self.status_message.setText("")
@@ -109,7 +88,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # image = self.process.changeBrightness(self.frame)   setDefaultSuffix(".avi").
         # image = self.process.apply_filters(self.frame)
         # cv2.imwrite(output_filename, image)
-        self.status_message.setText(f"writing to file")
+        self.status_message.setText(f"writing to file...it'll take a minute")
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
         if output_filename != '':
 
@@ -117,7 +96,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             if self.process.triangulate:
                 self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
             self.video.generate_color(output_filename + extension)
-            self.status_message.setText("Write finished")
+            self.status_message.setText("Write finished, go take a look")
         else:
             self.status_message.setText("")
 
