@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1215</width>
-    <height>794</height>
+    <height>795</height>
    </rect>
   </property>
   <property name="font">
@@ -57,11 +57,11 @@
           </item>
           <item>
            <widget class="QLabel" name="image_preview">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(239, 239, 239); border : 2px solid rgb(209, 209, 209); min-height: 700; min-width:  700; </string>
+            </property>
             <property name="text">
              <string/>
-            </property>
-            <property name="pixmap">
-             <pixmap>black.jpg</pixmap>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
