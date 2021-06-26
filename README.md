@@ -1,15 +1,15 @@
 # Delaunay-Dream
-
+ 
+## Description
+This Application allows the user to apply Delaunay triangulation to videos as a visual effect. It also allows for other visual effects such as changing the hue, saturation, and brightness of the video. All of these tools are presented in a simple and intuitive gui.
+ 
 ## Installation
-Navigate to root dir and run `pip install -U .`. (It's no longer necessary to have Cython/numpy pre-installed).
-
+Navigate to root directoryd and run `pip install -U .` 
+ 
 ## Commands
 *   To run the program, type `delaunaydream` in your terminal.
     - There is a sample video to try in the videopipe/Samples folder
-*   To create a new terminal command, use `plzrun` and `plzrun1` inside setup.py as examples. First make sure that the path to the directory of the desirred file is in the list of packages in setup.py.
-*   <s>To test triangulation, run `trigtest` from the root dir.
-    -  To test the triangulation function by itself, run `python3 setup.py build_ext --inplace` to build the library file to be used.</s>
-    - trigtest no longer works since we switched to headless opencv
-
-Remember to not commit your built library file to the repo.  
+ 
+ 
+### Github: https://github.com/chensation/Delaunay-Dream
 
