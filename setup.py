@@ -13,7 +13,7 @@ extensions = [
 
 setup(
     name="DelaunayDream",
-    version="0.0.1",
+    version="0.0.2",
     packages=["DelaunayDream", "DelaunayDream.gui", "DelaunayDream.triangulation", "DelaunayDream.videopipe"],
     url="https://github.com/chensation/Delaunay-Dream.git",
     author="drowning_princesses",
