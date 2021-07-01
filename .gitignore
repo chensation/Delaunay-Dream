@@ -5,3 +5,4 @@ __pycache__/
 /dist/
 DelaunayDream.egg-info/
 
+.vscode/settings.json
