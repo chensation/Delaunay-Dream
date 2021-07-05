@@ -29,30 +29,37 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.open_button.clicked.connect(self.load_video)
         self.export_button.clicked.connect(self.export_video)
 
+    def _update_func(func, *args, **kwargs):
+        def inner(self, *args, **kwargs):
+            func(self, *args, *kwargs)
+            if self.have_file:
+                self.update()
+
+        return inner
+
+    @_update_func
     def set_triangulation(self, triangulate):
         self.process.triangulate = triangulate
-        if self.have_file:
-            self.update()
 
+    @_update_func
     def set_frame_rate(self, frame_rate):
         self.process.frame_rate = frame_rate
-        if self.have_file:
-            self.update()
 
+    @_update_func
     def set_hue(self, hue):
         self.process.hue = hue
-        if self.have_file:
-            self.update()
 
+    @_update_func
     def set_saturation(self, saturation):
         self.process.saturation = saturation
-        if self.have_file:
-            self.update()
 
+    @_update_func
     def set_brightness(self, brightness):
         self.process.brightness = brightness
-        if self.have_file:
-            self.update()
+
+    @_update_func
+    def set_num_pts(self, num):
+        self.triangulation.num_points = num
 
     def update(self):
         self.status_message.setText('')
