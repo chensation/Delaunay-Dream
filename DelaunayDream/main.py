@@ -61,6 +61,22 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def set_num_pts(self, num):
         self.triangulation.num_points = num
 
+    @_update_func
+    def set_threshold(self, threshold):
+        self.triangulation.threshold = threshold
+
+    @_update_func
+    def set_image_scale(self, scale):
+        self.triangulation.image_scale = scale
+
+    @_update_func
+    def set_line(self, line):
+        self.triangulation.draw_line = line
+
+    @_update_func
+    def set_line_thickness(self, thickness):
+        self.triangulation.line_thickness = thickness
+
     def update(self):
         self.status_message.setText('')
         image = self.process.apply_filters(self.frame)
