@@ -6,3 +6,5 @@ __pycache__/
 DelaunayDream.egg-info/
 
 .vscode/settings.json
+*.avi
+*.mp4

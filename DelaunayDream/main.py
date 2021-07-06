@@ -19,7 +19,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.frame = None
         self.original = None
         self.video = Video()
-
+        self.user_fps = 5
         self.frame_rate_slider.valueChanged['int'].connect(self.set_frame_rate)
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
         self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
@@ -124,7 +124,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.video.process_video(self.process.apply_filters, True)
             if self.process.triangulate:
                 self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
-            self.video.generate_color(output_filename + extension)
+            #self.video.generate_color(output_filename + extension)
+            self.video.generate_with_fps(output_filename + extension, self.user_fps)
             self.status_message.setText("Write finished, go take a look")
         else:
             self.status_message.setText("")
