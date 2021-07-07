@@ -30,11 +30,11 @@ class Triangulation:
 
     @property
     def image_scale(self):
-        return self._image_scale
+        return self._image_scale * 100
 
     @image_scale.setter
     def image_scale(self, scale):
-        self._image_scale = scale
+        self._image_scale = scale / 100
 
     @property
     def draw_line(self):
