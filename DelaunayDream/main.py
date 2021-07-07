@@ -13,8 +13,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
-        self.process = Process()
-        self.triangulation = Triangulation(image_scale=0.1)
+        self.process = Process(triangulate=self.triangulation_check_box.isChecked())
+        self.triangulation = Triangulation(image_scale=self.scale_factor_spinBox.value()/100)
         self.have_file = False
         self.frame = None
         self.original = None
@@ -24,7 +24,13 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
         self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
         self.brightness_spinBox.valueChanged['int'].connect(self.set_brightness)
+
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
+        self.max_points_spinBox.valueChanged['int'].connect(self.set_num_pts)
+        self.threshold_spinBox.valueChanged['double'].connect(self.set_threshold)
+        self.scale_factor_spinBox.valueChanged['int'].connect(self.set_image_scale)
+        self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
+        self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
         self.open_button.clicked.connect(self.load_video)
         self.export_button.clicked.connect(self.export_video)
@@ -87,7 +93,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
         pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
-        self.image_preview.setPixmap(QtGui.QPixmap.fromImage(pic))
+        self.video_player.setPixmap(QtGui.QPixmap.fromImage(pic))
 
     def load_video(self):
         self.status_message.setText(f"reading from file...give it some time")
