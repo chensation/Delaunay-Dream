@@ -2,11 +2,35 @@ import cv2
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtCore import *
 from DelaunayDream.gui.gui import Ui_MainWindow
 from DelaunayDream.triangulation.triangulation import Triangulation
 from DelaunayDream.videopipe.video import Video
 from DelaunayDream.videopipe.process import Process
+
+
+""" Thread for file loading
+"""
+class load_file_thread(QThread):
+    load_finished = pyqtSignal(Video)
+    def __init__(self, filename):
+        QThread.__init__(self)
+        self.video = Video()
+        self.filename = filename
+    def __del__(self):
+        self.wait()
+    def load_file(self, filename):
+        if filename != '':
+            self.video.filename = filename
+            self.video.get_frames()
+
+            #self.frame = self.video.frame_list[0]
+    def run(self):
+        
+        self.load_file(self.filename)
+        self.load_finished.emit(self.video)
+        
+
 
 
 class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
@@ -26,7 +50,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.brightness_spinBox.valueChanged['int'].connect(self.set_brightness)
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
 
-        self.open_button.clicked.connect(self.load_video)
+        self.open_button.clicked.connect(self.thread_load_video)
         self.export_button.clicked.connect(self.export_video)
 
     def set_triangulation(self, triangulate):
@@ -54,6 +78,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         if self.have_file:
             self.update()
 
+    
     def update(self):
         self.status_message.setText('')
         image = self.process.apply_filters(self.frame)
@@ -82,6 +107,21 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         else:
             self.status_message.setText("")
+    def update_status(self, msg):
+        self.status_message.setText(msg)
+    def done(self):
+        self.status_message.setText("Thread is done.")
+    def update_video(self,v):
+        self.video = v
+        self.frame = self.video.frame_list[0]
+    def thread_load_video(self):
+        self.status_message.setText(f"Open clicked")
+        filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
+        self.load_thread = load_file_thread(filename)
+        #self.connect(self.load_thread, SIGNAL('update_status(QString)'), self.update_status)
+        self.load_thread.load_finished.connect(self.update_video)
+        self.load_thread.start()
+        self.status_message.setText("Thread is done.")
 
     def export_video(self):
         # output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
