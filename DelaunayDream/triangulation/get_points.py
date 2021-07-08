@@ -26,11 +26,11 @@ def generate_sample_points(img, max_points, threshold):
 
 def threshold_sample(n, weights):
     candidates = np.fliplr(np.argwhere(weights > 0))
-    if candidates.shape[0] < n:
-        raise ValueError(f"Not enough candidate points. "
-                         f"Only {candidates.shape[0]} available.")
 
-    return candidates[choice(candidates.shape[0], size=n, replace=False)]
+    if candidates.shape[0] <= n:
+        return candidates
+    else:
+        return candidates[np.around(np.linspace(0, candidates.shape[0] - 1, n)).astype(int)]
 
 
 def approx_canny(img, threshold=0.33):
