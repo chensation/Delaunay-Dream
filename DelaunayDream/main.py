@@ -19,8 +19,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.frame = None
         self.original = None
         self.video = Video()
-        self.user_fps = 5
-        self.frame_rate_slider.valueChanged['int'].connect(self.set_frame_rate)
+
+        # TODO: remove these two once the gui is ready
+        self.frame_rate_spinBox.valueChanged['int'].connect(self.set_frame_rate)
+        self.frame_rate_spinBox.setValue(5)
+
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
         self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
         self.brightness_spinBox.valueChanged['int'].connect(self.set_brightness)
@@ -32,6 +35,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
         self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
+        self.apply_button.clicked.connect(self.process_video)
         self.open_button.clicked.connect(self.load_video)
         self.export_button.clicked.connect(self.export_video)
 
@@ -47,9 +51,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def set_triangulation(self, triangulate):
         self.process.triangulate = triangulate
 
-    @_update_func
+    @_update_func # TODO: remove this after gui is ready
     def set_frame_rate(self, frame_rate):
-        self.process.frame_rate = frame_rate
+        self.video.output_fps = frame_rate
 
     @_update_func
     def set_hue(self, hue):
@@ -84,7 +88,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation.line_thickness = thickness
 
     def update(self):
-        self.status_message.setText('')
+        self.update_console_message('')
         image = self.process.apply_filters(self.frame)
 
         if self.process.triangulate:
@@ -96,7 +100,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.video_player.setPixmap(QtGui.QPixmap.fromImage(pic))
 
     def load_video(self):
-        self.status_message.setText(f"reading from file...give it some time")
+        self.update_console_message(f"reading from file...give it some time")
         filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
         if filename != '':
             # self.frame = cv2.imread(self.filename)
@@ -107,28 +111,40 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
             self.frame = self.video.frame_list[0]
             self.update()
-            self.status_message.setText("All frames loaded and ready")
+            self.update_console_message("All frames loaded and ready")
 
         else:
-            self.status_message.setText("")
+            self.update_console_message("")
+
+    def process_video(self):
+
+        self.update_console_message("Applying changes to all frames, please wait...")
+        # TODO: temp solution until gui for selecting fps on open video is ready
+        self.video.apply_output_framerate(self.video.output_fps)
+
+        self.video.process_video(self.process.apply_filters)
+        if self.process.triangulate:
+            self.video.process_video(self.triangulation.apply_triangulation)
+
+        self.update_console_message("All frames processed")
 
     def export_video(self):
         # output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
         # image = self.process.changeBrightness(self.frame)   setDefaultSuffix(".avi").
         # image = self.process.apply_filters(self.frame)
         # cv2.imwrite(output_filename, image)
-        self.status_message.setText(f"writing to file...it'll take a minute")
+        self.update_console_message(f"writing to file...it'll take a minute")
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
         if output_filename != '':
 
-            self.video.process_video(self.process.apply_filters, True)
-            if self.process.triangulate:
-                self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
-            #self.video.generate_color(output_filename + extension)
-            self.video.generate_with_fps(output_filename + extension, self.user_fps)
-            self.status_message.setText("Write finished, go take a look")
+            self.video.export_video(output_filename + extension)
+            #  self.video.generate_with_fps(output_filename + extension, self.user_fps)
+            self.update_console_message("Write finished, go take a look")
         else:
-            self.status_message.setText("")
+            self.update_console_message("")
+
+    def update_console_message(self, message):
+        self.status_message.setText(message)
 
 
 def main():
