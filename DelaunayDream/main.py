@@ -11,7 +11,8 @@ from DelaunayDream.videopipe.process import Process
 
 """ Thread for file loading
 """
-class load_file_thread(QThread):
+class load_worker(QThread):
+    loading_sig = pyqtSignal(str)
     load_finished = pyqtSignal(Video)
     def __init__(self, filename):
         QThread.__init__(self)
@@ -26,7 +27,7 @@ class load_file_thread(QThread):
 
             #self.frame = self.video.frame_list[0]
     def run(self):
-        
+        self.loading_sig.emit("loading ...")
         self.load_file(self.filename)
         self.load_finished.emit(self.video)
         
@@ -107,21 +108,23 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         else:
             self.status_message.setText("")
-    def update_status(self, msg):
-        self.status_message.setText(msg)
-    def done(self):
-        self.status_message.setText("Thread is done.")
-    def update_video(self,v):
+
+    def on_load_finished(self,v):
         self.video = v
-        self.frame = self.video.frame_list[0]
+        self.have_file = True
+        self.frame =self.video.frame_list[0]
+        self.update()
+        self.status_message.setText("file loaded and ready")
+    def on_loading(self,s):
+        self.status_message.setText(s)
     def thread_load_video(self):
         self.status_message.setText(f"Open clicked")
         filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
-        self.load_thread = load_file_thread(filename)
-        #self.connect(self.load_thread, SIGNAL('update_status(QString)'), self.update_status)
-        self.load_thread.load_finished.connect(self.update_video)
-        self.load_thread.start()
-        self.status_message.setText("Thread is done.")
+        self.worker = load_worker(filename)
+        self.worker.loading_sig.connect(self.on_loading)
+        self.worker.load_finished.connect(self.on_load_finished)
+        self.worker.start()
+        
 
     def export_video(self):
         # output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
