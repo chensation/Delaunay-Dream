@@ -104,6 +104,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.apply_button.clicked.connect(self.thread_process_video)
         self.open_button.clicked.connect(self.thread_load_video)
+        self.export_button.setEnabled(False)
         self.export_button.clicked.connect(self.thread_export_video)
 
     def _update_func(func, *args, **kwargs):
@@ -172,10 +173,23 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def on_receving_msg(self, s):
         self.update_console_message(s)
 
+    def on_loading(self, s):
+        self.update_console_message(s)
+        self.export_button.setEnabled(False)
+        self.open_button.setEnabled(False)
+    def on_applying(self, s):
+        self.update_console_message(s)
+        self.apply_button.setEnabled(False)
+        self.open_button.setEnabled(False)
+        self.export_button.setEnabled(False)
+
     def on_apply_finished(self, s, vid, proc):
         self.update_console_message(s)
         self.video = vid
         self.process = proc
+        self.apply_button.setEnabled(True)
+        self.open_button.setEnabled(True)
+        self.export_button.setEnabled(True)
 
     def on_load_finished(self, v, s):
         self.video = v
@@ -183,29 +197,40 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.frame =self.video.frame_list[0]
         self.frame_rate_spinBox.setValue(self.video.fps)
         self.update()
+        self.export_button.setEnabled(True)
+        self.open_button.setEnabled(True)
         self.update_console_message(s)
+
+    def on_exporting(self, s):
+        self.update_console_message(s)
+        self.open_button.setEnabled(False)
+        self.export_button.setEnabled(False)
+    def on_export_finished(self, s):
+        self.update_console_message(s)
+        self.export_button.setEnabled(True)
+        self.open_button.setEnabled(True)
 
 
     def thread_load_video(self):
-        self.status_message.setText(f"Choose a file to open")
+        self.update_console_message("Choose a file to open")
         filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
         self.worker = load_worker(filename)
-        self.worker.load_in_process.connect(self.on_receving_msg)
+        self.worker.load_in_process.connect(self.on_loading)
         self.worker.load_finished.connect(self.on_load_finished)
         self.worker.start()
 
     def thread_process_video(self):
         self.apply_worker = apply_worker(self.video, self.process, self.triangulation)
-        self.apply_worker.apply_in_process.connect(self.on_receving_msg)
+        self.apply_worker.apply_in_process.connect(self.on_applying)
         self.apply_worker.apply_finished.connect(self.on_apply_finished)
         self.apply_worker.start()
-        
+
     def thread_export_video(self):
         self.update_console_message("Enter filename and extension...")
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
         self.export_worker = export_worker(self.video, output_filename, extension)
-        self.export_worker.export_in_process.connect(self.on_receving_msg)
-        self.export_worker.export_finished.connect(self.on_receving_msg)
+        self.export_worker.export_in_process.connect(self.on_exporting)
+        self.export_worker.export_finished.connect(self.on_export_finished)
         self.export_worker.start()
 
 
