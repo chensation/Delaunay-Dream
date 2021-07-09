@@ -6,7 +6,7 @@ class Video:
     def __init__(self, name=""):
         self.frame_list = []
         self.fourcc = None
-        self.input_fps = 0
+        self.fps = 0
         self.output_fps = 0
         self.video_size = ()
         self.result_frames = []
@@ -19,7 +19,7 @@ class Video:
         self.frame_list.clear()
         self.result_frames.clear()
         cap = cv.VideoCapture(self.filename)
-        self.input_fps = cap.get(cv.CAP_PROP_FPS)  # get video frame rate
+        self.fps = cap.get(cv.CAP_PROP_FPS)  # get video frame rate
         self.fourcc = cv.VideoWriter_fourcc(*'XVID')
         width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
         height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
@@ -44,9 +44,12 @@ class Video:
 
     # TODO: move this into load_video once the gui is ready
     def apply_output_framerate(self, alt_fps):
+        if alt_fps == self.fps:
+            self.result_frames = self.frame_list
+            return
         self.result_frames.clear()
         self.output_fps = alt_fps
-        step_size = int(self.input_fps/self.output_fps)
+        step_size = int(self.fps/self.output_fps)
         step = 1
 
         for frame in self.frame_list:

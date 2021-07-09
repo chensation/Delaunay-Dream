@@ -1,6 +1,6 @@
 import cv2
 import sys
-
+import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import *
 from DelaunayDream.gui.gui import Ui_MainWindow
@@ -12,8 +12,8 @@ from DelaunayDream.videopipe.process import Process
 """ Thread for file loading
 """
 class load_worker(QThread):
-    loading_sig = pyqtSignal(str)
-    load_finished = pyqtSignal(Video)
+    load_in_process = pyqtSignal(str)
+    load_finished = pyqtSignal(Video, str)
     def __init__(self, filename):
         QThread.__init__(self)
         self.video = Video()
@@ -27,10 +27,52 @@ class load_worker(QThread):
 
             #self.frame = self.video.frame_list[0]
     def run(self):
-        self.loading_sig.emit("loading ...")
+        self.load_in_process.emit(f"Loading frames from {os.path.basename(self.filename)}...")
         self.load_file(self.filename)
-        self.load_finished.emit(self.video)
-        
+        self.load_finished.emit(self.video, f"All frames from {os.path.basename(self.filename)} loaded and ready")
+
+""" Thread for apply all changes
+"""
+class apply_worker(QThread):
+    apply_in_process = pyqtSignal(str)
+    apply_finished = pyqtSignal(str, Video, Process)
+
+    def __init__(self, v, proc, tri):
+        QThread.__init__(self)
+        self.video = v
+        self.process = proc
+        self.triangulation = tri
+    def __del__(self):
+        self.wait()
+    def process_video(self):
+        self.video.apply_output_framerate(5)# reduce(1-30) this value for faster testing
+        self.video.process_video(self.process.apply_filters)
+        if self.process.triangulate:
+            self.video.process_video(self.triangulation.apply_triangulation)
+    def run(self):
+        self.apply_in_process.emit("Applying changes to all frames, please wait...")
+        self.process_video()
+        self.apply_finished.emit("All frames processed", self.video, self.process)
+
+""" Thread for writing
+"""
+class export_worker(QThread):
+    export_in_process = pyqtSignal(str)
+    export_finished = pyqtSignal(str)
+    def __init__(self, vid, filename, ex):
+        QThread.__init__(self)
+        self.video = vid
+        self.filename = filename
+        self.extension = ex
+    def __del__(self):
+        self.wait()
+    def export_video(self):
+        self.video.export_video(self.filename + self.extension)
+
+    def run(self):
+        self.export_in_process.emit(f"Writing to {os.path.basename(self.filename + self. extension)}...")
+        self.export_video()
+        self.export_finished.emit("Write finished, go take a look")
 
 
 
@@ -47,7 +89,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         # TODO: remove these two once the gui is ready
         self.frame_rate_spinBox.valueChanged['int'].connect(self.set_frame_rate)
-        self.frame_rate_spinBox.setValue(5)
+        self.frame_rate_spinBox.setValue(self.video.fps)
 
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
         self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
@@ -60,13 +102,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
         self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
-<<<<<<< HEAD
+        self.apply_button.clicked.connect(self.thread_process_video)
         self.open_button.clicked.connect(self.thread_load_video)
-=======
-        self.apply_button.clicked.connect(self.process_video)
-        self.open_button.clicked.connect(self.load_video)
->>>>>>> main
-        self.export_button.clicked.connect(self.export_video)
+        self.export_button.clicked.connect(self.thread_export_video)
 
     def _update_func(func, *args, **kwargs):
         def inner(self, *args, **kwargs):
@@ -118,7 +156,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     
     def update(self):
-        self.update_console_message('')
+        #TODO:find another way to clear status message
+        #currently removed for threading
+        #self.update_console_message('')
         image = self.process.apply_filters(self.frame)
 
         if self.process.triangulate:
@@ -129,66 +169,45 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
         self.video_player.setPixmap(QtGui.QPixmap.fromImage(pic))
 
-    def load_video(self):
-        self.update_console_message(f"reading from file...give it some time")
-        filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
-        if filename != '':
-            # self.frame = cv2.imread(self.filename)
-            # self.update()
-            self.have_file = True
-            self.video.filename = filename
-            self.video.get_frames()
+    def on_receving_msg(self, s):
+        self.update_console_message(s)
 
-            self.frame = self.video.frame_list[0]
-            self.update()
-            self.update_console_message("All frames loaded and ready")
+    def on_apply_finished(self, s, vid, proc):
+        self.update_console_message(s)
+        self.video = vid
+        self.process = proc
 
-        else:
-            self.update_console_message("")
-
-    def process_video(self):
-
-        self.update_console_message("Applying changes to all frames, please wait...")
-        # TODO: temp solution until gui for selecting fps on open video is ready
-        self.video.apply_output_framerate(self.video.output_fps)
-
-        self.video.process_video(self.process.apply_filters)
-        if self.process.triangulate:
-            self.video.process_video(self.triangulation.apply_triangulation)
-
-        self.update_console_message("All frames processed")
-
-    def on_load_finished(self,v):
+    def on_load_finished(self, v, s):
         self.video = v
         self.have_file = True
         self.frame =self.video.frame_list[0]
+        self.frame_rate_spinBox.setValue(self.video.fps)
         self.update()
-        self.status_message.setText("file loaded and ready")
-    def on_loading(self,s):
-        self.status_message.setText(s)
+        self.update_console_message(s)
+
+
     def thread_load_video(self):
-        self.status_message.setText(f"Open clicked")
+        self.status_message.setText(f"Choose a file to open")
         filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
         self.worker = load_worker(filename)
-        self.worker.loading_sig.connect(self.on_loading)
+        self.worker.load_in_process.connect(self.on_receving_msg)
         self.worker.load_finished.connect(self.on_load_finished)
         self.worker.start()
+
+    def thread_process_video(self):
+        self.apply_worker = apply_worker(self.video, self.process, self.triangulation)
+        self.apply_worker.apply_in_process.connect(self.on_receving_msg)
+        self.apply_worker.apply_finished.connect(self.on_apply_finished)
+        self.apply_worker.start()
         
-
-    def export_video(self):
-        # output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
-        # image = self.process.changeBrightness(self.frame)   setDefaultSuffix(".avi").
-        # image = self.process.apply_filters(self.frame)
-        # cv2.imwrite(output_filename, image)
-        self.update_console_message(f"writing to file...it'll take a minute")
+    def thread_export_video(self):
+        self.update_console_message("Enter filename and extension...")
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
-        if output_filename != '':
+        self.export_worker = export_worker(self.video, output_filename, extension)
+        self.export_worker.export_in_process.connect(self.on_receving_msg)
+        self.export_worker.export_finished.connect(self.on_receving_msg)
+        self.export_worker.start()
 
-            self.video.export_video(output_filename + extension)
-            #  self.video.generate_with_fps(output_filename + extension, self.user_fps)
-            self.update_console_message("Write finished, go take a look")
-        else:
-            self.update_console_message("")
 
     def update_console_message(self, message):
         self.status_message.setText(message)
