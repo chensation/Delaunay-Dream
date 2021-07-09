@@ -38,8 +38,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
-        self.process = Process()
-        self.triangulation = Triangulation(image_scale=0.1)
+        self.process = Process(triangulate=self.triangulation_check_box.isChecked())
+        self.triangulation = Triangulation(image_scale=self.scale_factor_spinBox.value()/100)
         self.have_file = False
         self.frame = None
         self.original = None
@@ -49,35 +49,64 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
         self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
         self.brightness_spinBox.valueChanged['int'].connect(self.set_brightness)
+
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
+        self.max_points_spinBox.valueChanged['int'].connect(self.set_num_pts)
+        self.threshold_spinBox.valueChanged['double'].connect(self.set_threshold)
+        self.scale_factor_spinBox.valueChanged['int'].connect(self.set_image_scale)
+        self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
+        self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
         self.open_button.clicked.connect(self.thread_load_video)
         self.export_button.clicked.connect(self.export_video)
 
+    def _update_func(func, *args, **kwargs):
+        def inner(self, *args, **kwargs):
+            func(self, *args, *kwargs)
+            if self.have_file:
+                self.update()
+
+        return inner
+
+    @_update_func
     def set_triangulation(self, triangulate):
         self.process.triangulate = triangulate
-        if self.have_file:
-            self.update()
 
+    @_update_func
     def set_frame_rate(self, frame_rate):
         self.process.frame_rate = frame_rate
-        if self.have_file:
-            self.update()
 
+    @_update_func
     def set_hue(self, hue):
         self.process.hue = hue
-        if self.have_file:
-            self.update()
 
+    @_update_func
     def set_saturation(self, saturation):
         self.process.saturation = saturation
-        if self.have_file:
-            self.update()
 
+    @_update_func
     def set_brightness(self, brightness):
         self.process.brightness = brightness
-        if self.have_file:
-            self.update()
+
+    @_update_func
+    def set_num_pts(self, num):
+        self.triangulation.num_points = num
+
+    @_update_func
+    def set_threshold(self, threshold):
+        self.triangulation.threshold = threshold
+
+    @_update_func
+    def set_image_scale(self, scale):
+        self.triangulation.image_scale = scale
+
+    @_update_func
+    def set_line(self, line):
+        self.triangulation.draw_line = line
+
+    @_update_func
+    def set_line_thickness(self, thickness):
+        self.triangulation.line_thickness = thickness
 
     
     def update(self):
@@ -90,7 +119,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
         pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
-        self.image_preview.setPixmap(QtGui.QPixmap.fromImage(pic))
+        self.video_player.setPixmap(QtGui.QPixmap.fromImage(pic))
 
     def load_video(self):
         self.status_message.setText(f"reading from file...give it some time")

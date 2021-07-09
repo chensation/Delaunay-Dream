@@ -45,7 +45,7 @@ class Process:
     # Saturation
     @property
     def saturation(self):
-        return self.__saturation
+        return self.__saturation * 100
 
     @saturation.setter
     def saturation(self, saturation):
@@ -54,7 +54,7 @@ class Process:
     # Brightness
     @property
     def brightness(self):
-        return self.__brightness
+        return self.__brightness * 100
 
     @brightness.setter
     def brightness(self, brightness):
