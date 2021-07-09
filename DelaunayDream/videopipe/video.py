@@ -19,7 +19,7 @@ class Video:
         self.frame_list.clear()
         self.result_frames.clear()
         cap = cv.VideoCapture(self.filename)
-        self.fps = cap.get(cv.CAP_PROP_FPS)  # get video frame rate
+        self.fps = int(cap.get(cv.CAP_PROP_FPS)) # get video frame rate
         self.fourcc = cv.VideoWriter_fourcc(*'XVID')
         width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
         height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
@@ -44,20 +44,18 @@ class Video:
 
     # TODO: move this into load_video once the gui is ready
     def apply_output_framerate(self, alt_fps):
-        if alt_fps == self.fps:
-            self.result_frames = self.frame_list
-            return
         self.result_frames.clear()
         self.output_fps = alt_fps
         step_size = int(self.fps/self.output_fps)
-        step = 1
 
-        for frame in self.frame_list:
-            if step == 1:
+        if step_size == 1:
+            self.result_frames = self.frame_list
+            return
+
+        for index, frame in enumerate(self.frame_list):
+            if index % step_size == 0:
                 self.result_frames.append(frame)
-            elif step == step_size:
-                step = 0
-            step += 1
+
 
     def process_video(self, func):
         self.result_frames = list(map(func, self.result_frames))

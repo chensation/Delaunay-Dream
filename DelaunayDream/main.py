@@ -45,7 +45,7 @@ class apply_worker(QThread):
     def __del__(self):
         self.wait()
     def process_video(self):
-        self.video.apply_output_framerate(5)# reduce(1-30) this value for faster testing
+        self.video.apply_output_framerate(self.video.output_fps)# reduce(1-30) this value for faster testing
         self.video.process_video(self.process.apply_filters)
         if self.process.triangulate:
             self.video.process_video(self.triangulation.apply_triangulation)
@@ -177,6 +177,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.export_button.setEnabled(False)
         self.open_button.setEnabled(False)
+
     def on_applying(self, s):
         self.update_console_message(s)
         self.apply_button.setEnabled(False)
@@ -205,11 +206,13 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.open_button.setEnabled(False)
         self.export_button.setEnabled(False)
+
     def on_export_finished(self, s):
         self.update_console_message(s)
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
 
+    # TODO: don't create a new object every time these functions are called
 
     def thread_load_video(self):
         self.update_console_message("Choose a file to open")
