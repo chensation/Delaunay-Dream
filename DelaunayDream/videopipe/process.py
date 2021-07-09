@@ -10,7 +10,6 @@ class Process:
 
     def __init__(self, triangulate=False, frame_rate=0, hue=0, saturation=1, brightness=1):
         self.__triangulate = triangulate
-        self.__frame_rate = frame_rate
         self.__hue = hue
         self.__saturation = saturation
         self.__brightness = brightness
@@ -23,15 +22,6 @@ class Process:
     @triangulate.setter
     def triangulate(self, triangulate):
         self.__triangulate = triangulate
-
-    # Frame Rate
-    @property
-    def frame_rate(self):
-        return self.__frame_rate
-
-    @frame_rate.setter
-    def frame_rate(self, frame_rate):
-        self.__frame_rate = frame_rate
 
     # Hue
     @property
