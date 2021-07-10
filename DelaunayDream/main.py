@@ -43,7 +43,7 @@ class apply_worker(QThread):
         self.triangulation = tri
 
     def process_video(self):
-        self.video.apply_output_framerate(self.video.output_fps)# reduce(1-30) this value for faster testing
+        self.video.apply_output_framerate(5)# reduce(1-30) this value for faster testing
         self.video.process_video(self.process.apply_filters)
         if self.process.triangulate:
             self.video.process_video(self.triangulation.apply_triangulation)
@@ -229,7 +229,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def thread_export_video(self):
         self.update_console_message("Enter filename and extension...")
-        output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
+        file_filter = '.avi;; .wmv;; .mkv;; .mp4'
+        output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
         self.export_worker = export_worker(self.video, output_filename, extension)
         self.export_worker.export_in_process.connect(self.on_exporting)
         self.export_worker.export_finished.connect(self.on_export_finished)
