@@ -1,6 +1,8 @@
 import cv2
 import sys
 import os
+from timeit import timeit
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import *
 from DelaunayDream.gui.gui import Ui_MainWindow
