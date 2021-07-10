@@ -1,5 +1,5 @@
 import cv2 as cv
-
+import math
 
 class Video:
 
@@ -19,7 +19,7 @@ class Video:
         self.frame_list.clear()
         self.result_frames.clear()
         cap = cv.VideoCapture(self.filename)
-        self.fps = int(cap.get(cv.CAP_PROP_FPS)) # get video frame rate
+        self.fps = math.ceil(cap.get(cv.CAP_PROP_FPS)) # get video frame rate, use ceil as 23.976 fps is a popular format
         self.fourcc = cv.VideoWriter_fourcc(*'XVID')
         width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
         height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
