@@ -1,5 +1,6 @@
 import cv2
 import sys
+import os
 from timeit import timeit
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -45,9 +46,9 @@ class apply_worker(QThread):
 
     def process_video(self):
         self.video.apply_output_framerate(self.video.output_fps)# reduce(1-30) this value for faster testing
-        self.video.process_video(self.process.apply_filters)
+        print("Time to apply filters:", timeit(lambda:self.video.process_video(self.process.apply_filters), number=1))
         if self.process.triangulate:
-            self.video.process_video(self.triangulation.apply_triangulation)
+            print("Time to triangulate:", timeit(lambda:self.video.process_video(self.triangulation.apply_triangulation), number=1))
 
     def run(self):
         self.apply_in_process.emit("Applying changes to all frames, please wait...")
@@ -237,32 +238,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.export_worker.start()
 
 
-    def export_video(self):
-        # output_filename = QtWidgets.QFileDialog.getSaveFileName(filter="Video files(*.*)")[0]
-        # image = self.process.changeBrightness(self.frame)   setDefaultSuffix(".avi").
-        # image = self.process.apply_filters(self.frame)
-        # cv2.imwrite(output_filename, image)
-        self.status_message.setText(f"writing to file...it'll take a minute")
-        output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=self.tr(".avi"))
-        if output_filename != '':
-
-            # self.video.process_video(self.process.apply_filters, True)
-            # if self.process.triangulate:
-            #     self.video.process_video(self.triangulation.apply_triangulation, process_original=False)
-            print("Time to process for output:", timeit(lambda:self.seperate_function_for_timing(), number=1))
-
-            self.video.generate_color(output_filename + extension)
-            self.status_message.setText("Write finished, go take a look")
-        else:
-            self.status_message.setText("")
-    
-    def seperate_function_for_timing(self):
-        print("Time to apply filters:", timeit(lambda:self.video.process_video(self.process.apply_filters, True), number=1))
-        
-        if self.process.triangulate:
-             print("Time to triangulate:", timeit(lambda:self.video.process_video(self.triangulation.apply_triangulation, process_original=False), number=1))
-            
-        
+    def update_console_message(self, message):
+        self.status_message.setText(message)
 
 
 def main():
