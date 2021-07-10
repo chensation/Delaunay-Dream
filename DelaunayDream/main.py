@@ -18,8 +18,7 @@ class load_worker(QThread):
         QThread.__init__(self)
         self.video = Video()
         self.filename = filename
-    def __del__(self):
-        self.wait()
+
     def load_file(self, filename):
         if filename != '':
             self.video.filename = filename
@@ -42,13 +41,13 @@ class apply_worker(QThread):
         self.video = v
         self.process = proc
         self.triangulation = tri
-    def __del__(self):
-        self.wait()
+
     def process_video(self):
         self.video.apply_output_framerate(self.video.output_fps)# reduce(1-30) this value for faster testing
         self.video.process_video(self.process.apply_filters)
         if self.process.triangulate:
             self.video.process_video(self.triangulation.apply_triangulation)
+
     def run(self):
         self.apply_in_process.emit("Applying changes to all frames, please wait...")
         self.process_video()
@@ -59,13 +58,13 @@ class apply_worker(QThread):
 class export_worker(QThread):
     export_in_process = pyqtSignal(str)
     export_finished = pyqtSignal(str)
+
     def __init__(self, vid, filename, ex):
         QThread.__init__(self)
         self.video = vid
         self.filename = filename
         self.extension = ex
-    def __del__(self):
-        self.wait()
+
     def export_video(self):
         self.video.export_video(self.filename + self.extension)
 
