@@ -35,6 +35,7 @@ class Video:
             # if cv.waitKey(20) & 0xFF == ord('d'):
             #     break
         cap.release()
+        self.result_frames = self.frame_list
         # cv.destroyAllWindows()
 
     def export_video(self, filename, have_color=True):
