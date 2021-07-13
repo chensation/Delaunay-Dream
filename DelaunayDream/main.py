@@ -43,7 +43,7 @@ class apply_worker(QThread):
         self.triangulation = tri
 
     def process_video(self):
-        self.video.apply_output_framerate(5)# reduce(1-30) this value for faster testing
+        self.video.apply_output_framerate(self.video.output_fps)# reduce(1-30) this value for faster testing
         self.video.process_video(self.process.apply_filters)
         if self.process.triangulate:
             self.video.process_video(self.triangulation.apply_triangulation)
