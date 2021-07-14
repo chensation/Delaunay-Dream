@@ -43,7 +43,6 @@ class Note:
         sharedArray = np.ndarray(inputArray.shape, dtype=inputArray.dtype, buffer=shm.buf)
         sharedArray[:] = inputArray[:]
 
-
         print("Processing frames")
         Q1out = multiprocessing.Process(target = self.process_frames_sharedMem, args=(shm.name, inputFrames[:Q1], 1, Q1, sharedArray.shape, sharedArray.dtype))
         Q2out = multiprocessing.Process(target = self.process_frames_sharedMem, args=(shm.name, inputFrames[Q1:Q2], 2, Q1, sharedArray.shape, sharedArray.dtype))
@@ -70,8 +69,6 @@ class Note:
     
     def process_frames_sharedMem(self, sharedMemName, inputArray, q, Q1, shape, dataType):
         print("Starting process", q )
-        # Q1 = len(inputArray)
-        # print("Q1 for q", q, "is", Q1)
         shm = shared_memory.SharedMemory(name=sharedMemName)
         sharedArray = np.ndarray(shape, dtype=dataType, buffer=shm.buf)
 
@@ -93,12 +90,13 @@ class Note:
 
     def process_frames(self, inputFrames):
         outputFrames = [None]*len(inputFrames)
-        Q1 = len(outputFrames)//4
-        print("Processing frames")
-        for index, frame in enumerate(inputFrames):
-            if index % Q1 == 0: print(" . ", end='', flush=True)
-            outputFrames[index] = self.triangulate(frame)
-        print("Num Frames processed: ", len(outputFrames))
+        # Q1 = len(outputFrames)//4
+        # print("Processing frames")
+        outputFrames = list(map(self.triangulate, inputFrames))
+        # for index, frame in enumerate(inputFrames):
+        #     if index % Q1 == 0: print(" . ", end='', flush=True)
+        #     outputFrames[index] = self.triangulate(frame)
+        # print("Num Frames processed: ", len(outputFrames))
         return outputFrames
 
     def triangulate(self, frame):
@@ -121,7 +119,8 @@ class Note:
             outputFrames.append(frame) #possibly use hstack here instead and keep everythin as np array
         cap.release()
         print("Frames loaded from video: \n\tNum Frames: ", len(outputFrames), "\n\tFrame shape: ", outputFrames[0].shape)
-        return outputFrames
+        
+        return np.array(outputFrames)
 
 
 if __name__ == '__main__':
