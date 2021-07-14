@@ -1,5 +1,6 @@
 import cv2
 import sys
+import time
 import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import *
@@ -7,6 +8,32 @@ from DelaunayDream.gui.gui import Ui_MainWindow
 from DelaunayDream.triangulation.triangulation import Triangulation
 from DelaunayDream.videopipe.video import Video
 from DelaunayDream.videopipe.process import Process
+
+
+
+
+""" Thread for video player
+"""
+class video_worker(QThread):
+    play_in_process = pyqtSignal(str)
+    update_curr_frame = pyqtSignal(QtGui.QImage)
+    def __init__(self, vid):
+        QThread.__init__(self)
+        self.pause = False
+        self.video = vid
+    def frame_to_qt(self, frame):
+        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
+        pic = to_qt.scaled(644, 484, QtCore.Qt.KeepAspectRatio)
+        return pic
+    def play_video(self):
+        for frame in self.video.result_frames:
+            qt_curr_frame = self.frame_to_qt(frame)
+            self.update_curr_frame.emit(qt_curr_frame)
+            time.sleep(1/self.video.output_fps)
+    def run(self):
+        self.play_in_process.emit("playing video")
+        self.play_video()
 
 
 """ Thread for file loading
@@ -43,7 +70,7 @@ class apply_worker(QThread):
         self.triangulation = tri
 
     def process_video(self):
-        self.video.apply_output_framerate(self.video.output_fps)# reduce(1-30) this value for faster testing
+        self.video.apply_output_framerate(5)# reduce(1-30) this value for faster testing
         self.video.process_video(self.process.apply_filters)
         if self.process.triangulate:
             self.video.process_video(self.triangulation.apply_triangulation)
@@ -85,6 +112,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.frame = None
         self.original = None
         self.video = Video()
+        self.playback_thread = video_worker(self.video)
 
         # TODO: remove these two once the gui is ready
         self.frame_rate_spinBox.valueChanged['int'].connect(self.set_frame_rate)
@@ -105,6 +133,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.open_button.clicked.connect(self.thread_load_video)
         self.export_button.setEnabled(False)
         self.export_button.clicked.connect(self.thread_export_video)
+        self.play_button.clicked.connect(self.on_play_clicked)
 
     def _update_func(func, *args, **kwargs):
         def inner(self, *args, **kwargs):
@@ -186,6 +215,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def on_apply_finished(self, s, vid, proc):
         self.update_console_message(s)
         self.video = vid
+        self.playback_thread.video = vid
         self.process = proc
         self.apply_button.setEnabled(True)
         self.open_button.setEnabled(True)
@@ -196,6 +226,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.have_file = True
         self.frame =self.video.frame_list[0]
         self.frame_rate_spinBox.setValue(self.video.fps)
+        self.playback_thread.video = self.video
         self.update()
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
@@ -235,8 +266,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.export_worker.export_in_process.connect(self.on_exporting)
         self.export_worker.export_finished.connect(self.on_export_finished)
         self.export_worker.start()
-
-
+    def set_curr_frame(self, p):     
+        self.video_player.setPixmap(QtGui.QPixmap.fromImage(p))
+    def on_play_clicked(self):
+        self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
+        self.playback_thread.start()
     def update_console_message(self, message):
         self.status_message.setText(message)
 
