@@ -8,20 +8,22 @@ import numpy as np
 class Video:
 
     def __init__(self, name=""):
-        self.frame_list = []
+        self.frame_list = ()
         self.fourcc = None
         self.fps = 0
+        
         self.output_fps = 0
         self.video_size = ()
-        self.result_frames = []
+        self.result_frames = ()
         self.filename = name
 
     def get_frames(self):
         """ read the video according to filename,
             return list containing all frames
         """
-        self.frame_list.clear()
-        self.result_frames.clear()
+        # del self.frame_list
+        # del  self.result_frames
+        placeHolder = []
         cap = cv.VideoCapture(self.filename)
         self.fps = math.ceil(cap.get(cv.CAP_PROP_FPS)) # get video frame rate, use ceil as 23.976 fps is a popular format
         self.fourcc = cv.VideoWriter_fourcc(*'XVID')
@@ -34,12 +36,17 @@ class Video:
             if not success:
                 break
             # cv.imshow('Frame', frame)#display current frame-to be removed/modified
-            self.frame_list.append(frame)
-            self.result_frames.append(frame)
+            placeHolder.append(frame)
+            # self.frame_list.append(frame)
+            # self.result_frames.append(frame, axis=0)
 
             # if cv.waitKey(20) & 0xFF == ord('d'):
             #     break
         cap.release()
+
+        self.frame_list = np.array(placeHolder)
+        self.result_frames = np.array(placeHolder)
+        del placeHolder
         # cv.destroyAllWindows()
 
     def export_video(self, filename, have_color=True):
@@ -49,17 +56,19 @@ class Video:
 
     # TODO: move this into load_video once the gui is ready
     def apply_output_framerate(self, alt_fps):
-        self.result_frames.clear()
+        placeHolder = []
         self.output_fps = alt_fps
         step_size = int(self.fps/self.output_fps)
 
         if step_size == 1:
-            self.result_frames = self.frame_list
+            self.result_frames = self.frame_list.copy()
             return
 
         for index, frame in enumerate(self.frame_list):
             if index % step_size == 0:
-                self.result_frames.append(frame)
+                placeHolder.append(frame)
+
+        self.result_frames = np.array(placeHolder)
 
 
     # def process_video(self, func):
@@ -71,16 +80,15 @@ class Video:
         # self.result_frames = list(map(func, self.result_frames))
 
     def process_video(self, func):
-        inputFrames = self.result_frames
-        outputFrames = [None]*len(inputFrames)
-        Q1 = len(outputFrames)//4
+        # inputFrames = self.result_frames
+        Q1 = len(self.result_frames)//4
         Q2 = Q1 * 2
         Q3 = Q1 *3
 
-        inputArray = np.array(inputFrames)
-        shm = shared_memory.SharedMemory(create=True, size=inputArray.nbytes)
-        sharedArray = np.ndarray(inputArray.shape, dtype=inputArray.dtype, buffer=shm.buf)
-        sharedArray[:] = inputArray[:]
+        # inputArray = np.array(inputFrames)
+        shm = shared_memory.SharedMemory(create=True, size=self.result_frames.nbytes)
+        sharedArray = np.ndarray(self.result_frames.shape, dtype=self.result_frames.dtype, buffer=shm.buf)
+        sharedArray = self.result_frames.copy()
 
         Q1out = multiprocessing.Process(target = self.process_frames_sharedMem, args=(func, shm.name, inputFrames[:Q1], 1, Q1, sharedArray.shape, sharedArray.dtype))
         Q2out = multiprocessing.Process(target = self.process_frames_sharedMem, args=(func, shm.name, inputFrames[Q1:Q2], 2, Q1, sharedArray.shape, sharedArray.dtype))
@@ -97,7 +105,7 @@ class Video:
         Q3out.join()
         Q4out.join()
 
-        self.result_frames = list(sharedArray.copy())
+        self.result_frames = sharedArray.copy()
 
         del sharedArray
         shm.close()
