@@ -107,7 +107,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         
         #Video Playback
         self.play_button.clicked.connect(self.set_play_button)
-        self.stop_button.clicked.connect(self.dark_light_mode)
+        #self.stop_button.clicked.connect(self.dark_light_mode)
         #########################
 
         # TODO: remove these two once the gui is ready
@@ -203,7 +203,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.height = self.video_player.height()
 
     def open_dialog(self):
-        # self.setStyleSheet(StyleSheet().stylesheet2)
         self.dialog.exec_()
 
     def set_filename(self):
@@ -221,13 +220,13 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.play = True
             self.play_button.setText("Play")
     
-    def dark_light_mode(self):
-        if self.mode == True: 
-            self.setStyleSheet(StyleSheet().light_mode)
-            self.mode = False
-        else:
-            self.setStyleSheet(StyleSheet().dark_mode)
-            self.mode = True
+    #def dark_light_mode(self):
+       # if self.mode == True: 
+            #self.setStyleSheet(StyleSheet().light_mode)
+            #self.mode = False
+        #else:
+            #self.setStyleSheet(StyleSheet().dark_mode)
+            #self.mode = True
     #########################
 
     def on_receving_msg(self, s):
