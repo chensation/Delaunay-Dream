@@ -23,23 +23,10 @@ class video_worker(QThread):
     def __init__(self, vid):
         QThread.__init__(self)
         self.pause = False
-        self.resume = True
         self.video = vid
         self.curr_frame = None
         self.curr_frame_idx = -1
 
-    def update_self(self, index):
-        self.curr_frame_idx = index
-        self.curr_frame = self.video.result_frames[index]
-    def update_video(self, vid):
-        self.video = vid
-        
-        self.curr_frame = self.video.result_frames[self.curr_frame_idx]
-    def frame_to_qt(self, frame):
-        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
-        pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
-        return pic
     def play_video(self, frame_index):
         #while loop to play from curr_frame to end
         i = frame_index
@@ -47,15 +34,18 @@ class video_worker(QThread):
         while i < len(self.video.result_frames):
             if self.pause:
                 self.pause_sig.emit(self.curr_frame_idx)
+                self.update_curr_frame.emit(self.curr_frame)
                 return
-            self.curr_frame = self.video.result_frames[i]
+            
             self.curr_frame_idx = i
+            self.curr_frame = self.video.result_frames[i]
             #qt_curr_frame = self.frame_to_qt(self.curr_frame)
             #self.update_curr_frame.emit(qt_curr_frame)
             self.update_curr_frame.emit(self.curr_frame)
             i += 1
             time.sleep(1/self.video.output_fps)
-            
+        self.curr_frame_idx = 0
+        #self.curr_frame = self.video.result_frames[self.curr_frame_idx]
 
         #for loop to play the from start to end
         # for frame in self.video.result_frames:
@@ -147,9 +137,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.process = Process(triangulate=self.triangulation_check_box.isChecked())
         self.triangulation = Triangulation(image_scale=self.scale_factor_spinBox.value()/100)
         self.have_file = False
-        self.frame = None
-        self.curr_frame_index = -1
-        self.original = None
+        #self.frame = None
+        # self.curr_frame_index = -1
+        #self.original = None
         self.video = Video()
         self.playback_thread = video_worker(self.video)
 
@@ -241,14 +231,15 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def update_from_thread(self):
         image = self.process.apply_filters(self.playback_thread.curr_frame)
 
-        # if self.process.triangulate:
-        #     image = self.triangulation.apply_triangulation(image)
+        if self.process.triangulate:
+            image = self.triangulation.apply_triangulation(image)
 
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
-        pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
+        # pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
+        pic = self.frame_to_qt(image)
         self.video_player.setPixmap(QtGui.QPixmap.fromImage(pic))
-
+    
     def on_receving_msg(self, s):
         self.update_console_message(s)
 
@@ -267,7 +258,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.video = vid
         self.playback_thread.video = vid
-        self.set_curr_frame(self.playback_thread.video.result_frames[self.playback_thread.curr_frame_idx])
+        self.playback_thread.curr_frame = self.playback_thread.video.result_frames[self.playback_thread.curr_frame_idx]
+        self.set_curr_frame(self.playback_thread.curr_frame)
         self.process = proc
         self.apply_button.setEnabled(True)
         self.open_button.setEnabled(True)
@@ -279,13 +271,14 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.update_console_message("No file loaded")
             return
         
-        self.curr_frame_index = 0   #initialize frame index to the start of the video
+        # self.curr_frame_index = 0   #initialize frame index to the start of the video
+        # self.curr
         
         self.frame_rate_spinBox.setValue(self.video.fps)
         self.playback_thread.video = self.video
-        self.playback_thread.update_self(self.curr_frame_index)
-
-        self.set_curr_frame (self.playback_thread.video.result_frames[0])
+        self.playback_thread.curr_frame_idx = 0
+        self.playback_thread.curr_frame = self.playback_thread.video.result_frames[self.playback_thread.curr_frame_idx]
+        self.set_curr_frame (self.playback_thread.curr_frame)
         self.have_file = True
         #self.update()
         self.export_button.setEnabled(True)
@@ -341,16 +334,17 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def on_play_clicked(self):
         self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
         self.playback_thread.start()
+
     #TODO: Connect to actual pause button
     #currently connected to stop button
+
     def on_pause_clicked(self):
+
+        self.playback_thread.curr_frame = self.process.apply_filters(self.playback_thread.curr_frame)
+        if self.process.triangulate:
+            self.playback_thread.curr_frame = self.triangulation.apply_triangulation(self.playback_thread.curr_frame)
         self.playback_thread.pause = True
-
-
-
-
-
-
+        
 
 
         
