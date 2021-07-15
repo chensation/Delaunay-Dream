@@ -42,8 +42,17 @@ cdef delaunator_triangulate(np.ndarray[np.int_t] coords):
     # group the x and y coordinates together
     cdef np.ndarray tri_coords = coords.reshape((-1, 2))
 
+
+    # cdef np.ndarray testh = np.zeros([xmax, ymax], dtype=DTYPE)
+
+    # print(lent(tri_coords.shape), len(np_triangles.shape))
+    
+    tri_coords = tri_coords[np_triangles]
+    del d
+
+
     # sort then return the coordinates
-    return tri_coords[np_triangles]
+    return tri_coords
 
 
 def triangulate_frame(frame, coordinates, scale_factor=1, draw_line=False, thickness=1):
