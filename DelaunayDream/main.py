@@ -207,11 +207,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     @_update_func # TODO: remove this after gui is ready
     def set_frame_rate(self, frame_rate):
-        if frame_rate == "Default": ####Octavio's Changes####        
-            self.video.output_fps = 0 ####Octavio's Changes####
-        else: ####Octavio's Changes####
-            self.video.output_fps = int(frame_rate) ####Octavio's Changes####
-        print(self.video.output_fps) ####Octavio's Changes####
+        return  # not functional until framerate changes are in
 
     @_update_func
     def set_hue(self, hue):
@@ -246,19 +242,19 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation.line_thickness = thickness
 
     
-    def update(self):
-        #TODO:find another way to clear status message
-        #currently removed for threading
-        #self.update_console_message('')
-        image = self.process.apply_filters(self.frame)
-
-        if self.process.triangulate:
-            image = self.triangulation.apply_triangulation(image)
-
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
-        pic = to_qt.scaled(self.width, self.height, QtCore.Qt.KeepAspectRatio) ####Octavio's Changes####
-        self.video_player.setPixmap(QtGui.QPixmap.fromImage(pic))
+    # def update(self):
+    #     #TODO:find another way to clear status message
+    #     #currently removed for threading
+    #     #self.update_console_message('')
+    #     image = self.process.apply_filters(self.frame)
+    #
+    #     if self.process.triangulate:
+    #         image = self.triangulation.apply_triangulation(image)
+    #
+    #     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    #     to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
+    #     pic = to_qt.scaled(self.width, self.height, QtCore.Qt.KeepAspectRatio) ####Octavio's Changes####
+    #     self.video_player.setPixmap(QtGui.QPixmap.fromImage(pic))
     
     def update_from_thread(self):
         image = self.process.apply_filters(self.playback_thread.curr_frame)
@@ -339,7 +335,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # self.curr_frame_index = 0   #initialize frame index to the start of the video
         # self.curr
         
-        self.frame_rate_spinBox.setValue(self.video.fps)
         self.playback_thread.video = self.video
         self.playback_thread.curr_frame_idx = 0
         self.playback_thread.curr_frame = self.playback_thread.video.result_frames[self.playback_thread.curr_frame_idx]
@@ -390,8 +385,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def frame_to_qt(self, frame):
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
-        pic = to_qt.scaled(700, 700, QtCore.Qt.KeepAspectRatio)
+        pic = to_qt.scaled(self.width, self.height, QtCore.Qt.KeepAspectRatio)
         return pic
+
     def set_curr_frame(self, img):
         p = self.frame_to_qt(img)
 

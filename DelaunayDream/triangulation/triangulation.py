@@ -1,4 +1,4 @@
-from DelaunayDream.triangulation.get_points import generate_sample_points
+import DelaunayDream.triangulation.get_points as sampling
 from DelaunayDream.triangulation.triangulate import triangulate_frame
 
 
@@ -53,6 +53,8 @@ class Triangulation:
         self._line_thickness = thickness
 
     def apply_triangulation(self, frame):
-        self._coordinates = generate_sample_points(frame, self._num_points, self._threshold)
+        # change this depending on which sampling method we want to use
+        self._coordinates = sampling.generate_threshold_points(frame, self._num_points, self._threshold)
+
         tri_frame = triangulate_frame(frame, self._coordinates, self._image_scale, self._draw_line, self._line_thickness)
         return tri_frame
