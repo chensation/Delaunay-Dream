@@ -1,6 +1,8 @@
 import cv2
 import sys
 import os
+from timeit import timeit
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import *
 from DelaunayDream.gui.gui import Ui_MainWindow
@@ -44,9 +46,9 @@ class apply_worker(QThread):
 
     def process_video(self):
         self.video.apply_output_framerate(self.video.output_fps)# reduce(1-30) this value for faster testing
-        self.video.process_video(self.process.apply_filters)
+        print("Time to apply filters:", timeit(lambda:self.video.process_video(self.process.apply_filters), number=1))
         if self.process.triangulate:
-            self.video.process_video(self.triangulation.apply_triangulation)
+            print("Time to triangulate:", timeit(lambda:self.video.process_video(self.triangulation.apply_triangulation), number=1))
 
     def run(self):
         self.apply_in_process.emit("Applying changes to all frames, please wait...")
