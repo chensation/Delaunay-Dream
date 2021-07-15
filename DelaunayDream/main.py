@@ -31,7 +31,10 @@ class video_worker(QThread):
     def update_self(self, index):
         self.curr_frame_idx = index
         self.curr_frame = self.video.result_frames[index]
-
+    def update_video(self, vid):
+        self.video = vid
+        
+        self.curr_frame = self.video.result_frames[self.curr_frame_idx]
     def frame_to_qt(self, frame):
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
@@ -105,7 +108,7 @@ class apply_worker(QThread):
         self.triangulation = tri
 
     def process_video(self):
-        self.video.apply_output_framerate(5)# reduce(1-30) this value for faster testing
+        self.video.apply_output_framerate(self.video.output_fps)# reduce(1-30) this value for faster testing
         self.video.process_video(self.process.apply_filters)
         if self.process.triangulate:
             self.video.process_video(self.triangulation.apply_triangulation)
@@ -264,11 +267,12 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.video = vid
         self.playback_thread.video = vid
+        self.set_curr_frame(self.playback_thread.video.result_frames[self.playback_thread.curr_frame_idx])
         self.process = proc
         self.apply_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.export_button.setEnabled(True)
-
+    
     def on_load_finished(self, v, s):
         self.video = v
         if len(self.video.frame_list) == 0:
@@ -280,7 +284,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.frame_rate_spinBox.setValue(self.video.fps)
         self.playback_thread.video = self.video
         self.playback_thread.update_self(self.curr_frame_index)
-        self.frame =self.playback_thread.video.frame_list[0]
+
+        self.set_curr_frame (self.playback_thread.video.result_frames[0])
         self.have_file = True
         #self.update()
         self.export_button.setEnabled(True)
