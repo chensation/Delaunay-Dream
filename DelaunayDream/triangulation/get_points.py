@@ -34,7 +34,7 @@ def generate_sample_points(img, max_points, threshold):
     # Originally: n = min(round(height * width * args.rate), max_points)
     n = min(round(height * width * 0.03), max_points)
 
-    weights = approx_canny(img, threshold)
+    weights = approx_canny(img, threshold) > 0
     sample_points = poisson_sample(max_points, weights)
     corners = np.array([[0, 0], [0, height - 1], [width - 1, 0], [width - 1, height - 1]])
     result = np.append(sample_points, corners, axis=0)
@@ -48,7 +48,7 @@ def getCanDisk(src, center, rH, rW):
     wOffset = int(np.max(np.array([0, center[1] - (2 * rW)])))
     trimmed = src[hOffset: int(np.min(np.array([src.shape[0], center[0] + (2 * rH)]))),
               wOffset: int(np.min(np.array([src.shape[1], center[1] + (2 * rW)])))]
-    candidates = np.argwhere(trimmed > 0) + np.array([hOffset, wOffset])
+    candidates = np.argwhere(trimmed == True) + np.array([hOffset, wOffset])
     canResults = candidates[
                  np.logical_and(
                      (((np.power(candidates[:, 0] - center[0], 2) / np.power(rH, 2)) + (
@@ -64,7 +64,7 @@ def getOthDisk(src, center, rH, rW):
     wOffset = int(np.max(np.array([0, center[1] - (2 * rW)])))
     trimmed = src[hOffset: int(np.min(np.array([src.shape[0], center[0] + (2 * rH)]))),
               wOffset: int(np.min(np.array([src.shape[1], center[1] + (2 * rW)])))]
-    others = np.argwhere(trimmed == 0) + np.array([hOffset, wOffset])
+    others = np.argwhere(trimmed == False) + np.array([hOffset, wOffset])
     othResults = others[
                  np.logical_and(
                      (((np.power(others[:, 0] - center[0], 2) / np.power(rH, 2)) + (
