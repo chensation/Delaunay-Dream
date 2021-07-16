@@ -23,7 +23,6 @@ from DelaunayDream.videopipe.process import Process
 class video_worker(QThread):
     play_in_process = pyqtSignal(str)
     pause_sig = pyqtSignal(int)
-    #update_curr_frame = pyqtSignal(QtGui.QImage)
     update_curr_frame = pyqtSignal(np.ndarray)
     def __init__(self, vid):
         QThread.__init__(self)
@@ -39,7 +38,7 @@ class video_worker(QThread):
         while i < len(self.video.result_frames):
             if self.pause:
                 self.pause_sig.emit(self.curr_frame_idx)
-                self.update_curr_frame.emit(self.curr_frame)
+                #self.update_curr_frame.emit(self.curr_frame)
                 return
             
             self.curr_frame_idx = i
@@ -50,20 +49,7 @@ class video_worker(QThread):
             i += 1
             time.sleep(1/self.video.output_fps)
         self.curr_frame_idx = 0
-        #self.curr_frame = self.video.result_frames[self.curr_frame_idx]
 
-        #for loop to play the from start to end
-        # for frame in self.video.result_frames:
-        #     if self.pause:
-        #         self.pause_sig.emit(self.curr_frame, self.curr_frame_idx)
-        #         return
-        #     if self.resume:
-
-        #     self.curr_frame = frame
-        #     self.curr_frame_idx = self.video.result_frames.index(self.curr_frame)
-        #     qt_curr_frame = self.frame_to_qt(self.curr_frame)
-        #     self.update_curr_frame.emit(qt_curr_frame)
-        #     time.sleep(1/self.video.output_fps)
     def run(self):
         self.play_in_process.emit("playing video")
         self.play_video(self.curr_frame_idx)
@@ -390,23 +376,26 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def set_curr_frame(self, img):
         p = self.frame_to_qt(img)
-
         self.video_player.setPixmap(QtGui.QPixmap.fromImage(p))
 
 
     def on_play_clicked(self):
+        self.playback_thread.pause = not self.playback_thread.pause
         self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
+        self.playback_thread.pause_sig.connect(self.on_pause_sig)
         self.playback_thread.start()
 
     #TODO: Connect to actual pause button
     #currently connected to stop button
+    def on_pause_sig(self, index):
+        self.set_curr_frame(self.playback_thread.result_frames[index])
 
-    def on_pause_clicked(self):
+    # def on_pause_clicked(self):
 
-        self.playback_thread.curr_frame = self.process.apply_filters(self.playback_thread.curr_frame)
-        if self.process.triangulate:
-            self.playback_thread.curr_frame = self.triangulation.apply_triangulation(self.playback_thread.curr_frame)
-        self.playback_thread.pause = True
+    #     self.playback_thread.curr_frame = self.process.apply_filters(self.playback_thread.curr_frame)
+    #     if self.process.triangulate:
+    #         self.playback_thread.curr_frame = self.triangulation.apply_triangulation(self.playback_thread.curr_frame)
+    #     self.playback_thread.pause = True
         
 
 
