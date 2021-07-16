@@ -22,9 +22,10 @@ from DelaunayDream.videopipe.process import Process
 """
 class video_worker(QThread):
     play_in_process = pyqtSignal(str)
-    pause_sig = pyqtSignal(int)
+    #pause_sig = pyqtSignal(int)
+    pause_sig = pyqtSignal(np.ndarray)
     update_curr_frame = pyqtSignal(np.ndarray)
-    def __init__(self, vid):
+    def __init__(self, vid ):
         QThread.__init__(self)
         self.pause = False
         self.video = vid
@@ -37,7 +38,7 @@ class video_worker(QThread):
         self.pause = False
         while i < len(self.video.result_frames):
             if self.pause:
-                self.pause_sig.emit(self.curr_frame_idx)
+                self.pause_sig.emit(self.curr_frame)
                 #self.update_curr_frame.emit(self.curr_frame)
                 return
             
@@ -176,7 +177,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.export_button.setEnabled(False)
         self.export_button.clicked.connect(self.thread_export_video)
         self.play_button.clicked.connect(self.on_play_clicked)
-        self.stop_button.clicked.connect(self.on_pause_clicked)
+        #self.stop_button.clicked.connect(self.on_pause_clicked)
 
     def _update_func(func, *args, **kwargs):
         def inner(self, *args, **kwargs):
@@ -305,6 +306,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.video = vid
         self.playback_thread.video = vid
+        self.reset_filter()
         self.playback_thread.curr_frame = self.playback_thread.video.result_frames[self.playback_thread.curr_frame_idx]
         self.set_curr_frame(self.playback_thread.curr_frame)
         self.process = proc
@@ -387,8 +389,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     #TODO: Connect to actual pause button
     #currently connected to stop button
-    def on_pause_sig(self, index):
-        self.set_curr_frame(self.playback_thread.result_frames[index])
+    def on_pause_sig(self, frame):
+        image = self.process.apply_filters(frame)
+        if self.process.triangulate:
+            image = self.triangulation.apply_triangulation(image)
+        self.set_curr_frame(image)
 
     # def on_pause_clicked(self):
 
@@ -397,7 +402,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     #         self.playback_thread.curr_frame = self.triangulation.apply_triangulation(self.playback_thread.curr_frame)
     #     self.playback_thread.pause = True
         
-
+    def reset_filter(self):
+        self.process.triangulate = False
+        self.process.hue = 0
+        self.process.saturation = 1
+        self.process.brightness = 1
 
         
     def update_console_message(self, message):
