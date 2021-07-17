@@ -86,6 +86,8 @@ class Video:
         for frame in self._frames:
             writer.write(frame)
 
+        writer.release()
+
     def process_video(self, func):
 
         Q1 = self._frames.shape[0]//4
