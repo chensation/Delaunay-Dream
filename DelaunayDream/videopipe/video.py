@@ -44,8 +44,11 @@ class Video:
         if not success:
             raise ValueError("Unable to open file")
 
-        return math.ceil(cap.get(cv.CAP_PROP_FPS))
-    
+        fps =  math.ceil(cap.get(cv.CAP_PROP_FPS))
+        cap.release()
+
+        return fps
+
     def load_frames(self):
         """ read the video according to filename,
         """
@@ -79,7 +82,7 @@ class Video:
         self._frames = np.asarray(temp_array)
 
     def export_video(self, filename, have_color=True):
-        writer = cv.VideoWriter(filename, self._fourcc, self.output_fps, self._video_size, have_color)
+        writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
         for frame in self._frames:
             writer.write(frame)
 
