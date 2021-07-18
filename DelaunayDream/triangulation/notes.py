@@ -4,6 +4,9 @@ from timeit import timeit
 import multiprocessing
 from multiprocessing import shared_memory
 import numpy as np
+import moviepy
+from moviepy.editor import *
+
 from triangulation import Triangulation
 
 class Note:
@@ -121,6 +124,15 @@ class Note:
         print("Frames loaded from video: \n\tNum Frames: ", len(outputFrames), "\n\tFrame shape: ", outputFrames[0].shape)
         
         return np.array(outputFrames)
+
+
+    def combine_with_audio(self, frames, filename):
+        def returnFrame(i):
+            return frames[i]
+        audio = AudioFileClip(filename).subclip(0,5)
+        clip = ImageSequenceClip(list(frames), fps = 25).subclip(0,5)
+        clip = clip.set_audio(audio)
+        clip.write_videofile("movie.mp4")
 
 
 if __name__ == '__main__':
