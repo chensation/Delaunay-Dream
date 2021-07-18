@@ -4,6 +4,7 @@ import multiprocessing
 from multiprocessing import shared_memory
 import multiprocessing as mp
 import numpy as np
+from moviepy.editor import *
 
 
 class Video:
@@ -14,6 +15,7 @@ class Video:
         
         self._video_size = ()
         self._frames = ()
+        self._audio = ()
         self._filename = name
 
     @property
@@ -80,13 +82,18 @@ class Video:
 
         cap.release()
         self._frames = np.asarray(temp_array)
+        self._audio = AudioFileClip(self._filename)
+
 
     def export_video(self, filename, have_color=True):
-        writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
-        for frame in self._frames:
-            writer.write(frame)
+        clip = ImageSequenceClip(list(self._frames), fps = self._fps)
+        clip = clip.set_audio(self._audio)
+        clip.write_videofile(filename, codec = self._fourcc)
 
-        writer.release()
+        # writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
+        # for frame in self._frames:
+        #     writer.write(frame)
+        # writer.release()
 
     def process_video(self, func):
 
