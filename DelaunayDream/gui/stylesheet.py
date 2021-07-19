@@ -20,7 +20,11 @@ class StyleSheet:
 
         QCheckBox {
             background-color: black;
-            color: white
+            color: white;
+        }
+
+        QRadioButton {
+            color: white;
         }
     
         QDialog {
@@ -33,6 +37,7 @@ class StyleSheet:
             color: white;
             font-size: 12px;
         }
+
         """
         self.light_mode = """
         #MainWindow {
@@ -55,7 +60,7 @@ class StyleSheet:
             background-color: white;
             color: black;
         }
-    
+
         QDialog {
             background: white;
             color: black;

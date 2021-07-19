@@ -7,6 +7,7 @@ from timeit import timeit
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from qtwidgets import AnimatedToggle
 from PyQt5.QtCore import *
 from DelaunayDream.gui.gui import Ui_MainWindow
 from DelaunayDream.gui.stylesheet import StyleSheet
@@ -14,7 +15,6 @@ from DelaunayDream.triangulation.triangulation import Triangulation
 from DelaunayDream.videopipe.video import Video
 from DelaunayDream.videopipe.process import Process
 from DelaunayDream.file_dialogue import FileDialogue
-
 
 
 """ Thread for video player
@@ -117,7 +117,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         self.process = Process(triangulate=self.triangulation_check_box.isChecked())
-        self.triangulation = Triangulation(image_scale=self.scale_factor_spinBox.value()/100)
+        self.triangulation = Triangulation(image_scale=10/100)
         self.have_file = False
 
         self.video = Video()
@@ -125,9 +125,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         ####Octavio's Changes####
         self.play = True
-        self.temp_filename = ""
+        # self.temp_filename = ""
         self.width = self.height = 0
-        self.mode = False
 
         # Pop-up Dialog       
         self.file_dialogue = FileDialogue(self.video)
@@ -135,7 +134,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         #Video Playback
         self.play_button.clicked.connect(self.set_play_button)
-        #self.stop_button.clicked.connect(self.dark_light_mode)
+        self.mode_toggle.toggled['bool'].connect(self.dark_light_mode)
         #########################
 
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
@@ -144,13 +143,13 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
         self.max_points_spinBox.valueChanged['int'].connect(self.set_num_pts)
-        self.threshold_spinBox.valueChanged['double'].connect(self.set_threshold)
-        self.scale_factor_spinBox.valueChanged['int'].connect(self.set_image_scale)
+        self.poisson_disk_radioButton.toggled['bool'].connect(self.sampling_method)
+        self.scale_factor_comboBox.highlighted['int'].connect(self.set_image_scale)
         self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
         self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
         self.apply_button.clicked.connect(self.thread_process_video)
-        self.open_button.clicked.connect(self.open_dialog) ####Octavio's Changes####
+        self.open_button.clicked.connect(self.open_dialog)
         self.export_button.setEnabled(False)
         self.export_button.clicked.connect(self.thread_export_video)
         self.play_button.clicked.connect(self.on_play_clicked)
@@ -190,11 +189,20 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation.num_points = num
 
     @_update_func
-    def set_threshold(self, threshold):
-        self.triangulation.threshold = threshold
+    def sampling_method(self, method):
+        print(method)
+        # self.triangulation.threshold = threshold
 
     @_update_func
     def set_image_scale(self, scale):
+        if scale == 0:
+            scale = 100
+        elif scale == 1:
+            scale = 50
+        elif scale == 2:
+            scale = 10
+        else:
+            scale = 1
         self.triangulation.image_scale = scale
 
     @_update_func
@@ -205,6 +213,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def set_line_thickness(self, thickness):
         self.triangulation.line_thickness = thickness
 
+    @_update_func
+    def resizeEvent(self, event):
+        self.width = self.video_player.width()
+        self.height = self.video_player.height()
+
     def update_from_thread(self):
         image = self.process.apply_filters(self.playback_thread.curr_frame)
 
@@ -213,9 +226,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.set_curr_frame(image)
     
-    def resizeEvent(self, event):
-        self.width = self.video_player.width()
-        self.height = self.video_player.height()
 
     def open_dialog(self):
         self.file_dialogue.exec_()
@@ -228,13 +238,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.play = True
             self.play_button.setText("Play")
     
-    #def dark_light_mode(self):
-       # if self.mode == True: 
-            #self.setStyleSheet(StyleSheet().light_mode)
-            #self.mode = False
-        #else:
-            #self.setStyleSheet(StyleSheet().dark_mode)
-            #self.mode = True
+    def dark_light_mode(self, mode):
+        if mode == False: 
+            self.setStyleSheet(StyleSheet().light_mode)
+        else:
+            self.setStyleSheet(StyleSheet().dark_mode)
 
     def on_loading(self, s):
         self.update_console_message(s)
