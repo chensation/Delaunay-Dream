@@ -21,7 +21,7 @@ from DelaunayDream.file_dialogue import FileDialogue
 """
 class video_worker(QThread):
     play_in_process = pyqtSignal(str)
-    #pause_sig = pyqtSignal(int)
+    update_slider_index = pyqtSignal(int)
     pause_sig = pyqtSignal(np.ndarray)
     update_curr_frame = pyqtSignal(np.ndarray)
     def __init__(self, vid ):
@@ -43,8 +43,7 @@ class video_worker(QThread):
             
             self.curr_frame_idx = i
             self.curr_frame = self.video.frames[i]
-            #qt_curr_frame = self.frame_to_qt(self.curr_frame)
-            #self.update_curr_frame.emit(qt_curr_frame)
+            self.update_slider_index.emit(self.curr_frame_idx)
             self.update_curr_frame.emit(self.curr_frame)
             i += 1
             time.sleep(1/self.video.framerate)
@@ -123,9 +122,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.video = Video()
         self.playback_thread = video_worker(self.video)
-
+        self.playback_thread.update_slider_index.connect(self.update_video_slider)
+        self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
+        self.playback_thread.pause_sig.connect(self.on_pause_sig)
         ####Octavio's Changes####
-        self.play = True
+        self.play = False
         self.temp_filename = ""
         self.width = self.height = 0
         self.mode = False
@@ -156,6 +157,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.export_button.clicked.connect(self.thread_export_video)
         self.play_button.clicked.connect(self.on_play_clicked)
         #self.stop_button.clicked.connect(self.on_pause_clicked)
+        self.video_slider.valueChanged['int'].connect(self.update_thread_index)
+        self.video_slider.sliderMoved.connect(self.on_slider_move)
+        self.video_slider.sliderReleased.connect(self.on_slider_released)
+        self.stop_button.clicked.connect(self.on_stop)
+
 
     def _update_func(func, *args, **kwargs):
         def inner(self, *args, **kwargs):
@@ -222,12 +228,12 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.file_dialogue.exec_()
 
     def set_play_button(self):
-        if self.play == True:
-            self.play = False
+        self.play = not self.play   #toggle state first
+        if self.play:
             self.play_button.setText("Pause")
         else:
-            self.play = True
             self.play_button.setText("Play")
+        
     
     #def dark_light_mode(self):
        # if self.mode == True: 
@@ -236,7 +242,25 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         #else:
             #self.setStyleSheet(StyleSheet().dark_mode)
             #self.mode = True
+    def update_thread_index(self, index):
+        self.playback_thread.curr_frame_idx = index
+        self.playback_thread.curr_frame = self.playback_thread.video.frames[index]
+        self.playback_thread.update_curr_frame.emit(self.playback_thread.curr_frame)
 
+    def update_video_slider(self, index):
+        self.video_slider.setValue(index)
+
+    def on_slider_move(self):
+        self.playback_thread.pause = True
+
+    def on_slider_released(self):
+        if self.play:
+            self.on_play_clicked()
+    def on_stop(self):
+        self.playback_thread.curr_frame_idx = 0
+        self.playback_thread.curr_frame = self.playback_thread.video.frames[0]
+        self.playback_thread.update_curr_frame.emit(self.playback_thread.curr_frame)
+        self.video_slider.setValue(0)
     def on_loading(self, s):
         self.update_console_message(s)
         self.export_button.setEnabled(False)
@@ -277,6 +301,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.have_file = True
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
+        self.video_slider.setMaximum(len(self.video.frames) - 1)
+        self.video_slider.setMinimum(0)
+        self.video_slider.setValue(0)
         self.update_console_message(s)
 
 
@@ -327,8 +354,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def on_play_clicked(self):
         self.playback_thread.pause = not self.playback_thread.pause
-        self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
-        self.playback_thread.pause_sig.connect(self.on_pause_sig)
+        # self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
+        # self.playback_thread.pause_sig.connect(self.on_pause_sig)
         self.playback_thread.start()
 
     #TODO: Connect to actual pause button
