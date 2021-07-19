@@ -306,7 +306,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.video = vid
         self.playback_thread.video = vid
-        self.reset_filter()
         self.playback_thread.curr_frame = self.playback_thread.video.result_frames[self.playback_thread.curr_frame_idx]
         self.set_curr_frame(self.playback_thread.curr_frame)
         self.process = proc
@@ -402,11 +401,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     #         self.playback_thread.curr_frame = self.triangulation.apply_triangulation(self.playback_thread.curr_frame)
     #     self.playback_thread.pause = True
         
-    def reset_filter(self):
-        self.process.triangulate = False
-        self.process.hue = 0
-        self.process.saturation = 1
-        self.process.brightness = 1
+    # def reset_filter(self):
+    #     self.process.triangulate = False
+    #     self.process.hue = 0
+    #     self.process.saturation = 1
+    #     self.process.brightness = 1
 
         
     def update_console_message(self, message):
