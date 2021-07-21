@@ -6,7 +6,6 @@ import numpy as np
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from qtwidgets import AnimatedToggle
 from PyQt5.QtCore import *
 from DelaunayDream.gui.gui import Ui_MainWindow
 from DelaunayDream.gui.stylesheet import StyleSheet
@@ -148,6 +147,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
         self.apply_button.clicked.connect(self.thread_process_video)
+        self.reset_button.clicked.connect(self.thread_load_video)
         self.open_button.clicked.connect(self.open_dialog)
         self.export_button.setEnabled(False)
         self.apply_button.setEnabled(False)
@@ -268,6 +268,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.export_button.setEnabled(True)
+        self.reset_button.setEnabled(True)
 
     def on_load_finished(self, v, s):
         self.video = v
@@ -283,6 +284,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.apply_button.setEnabled(True)
+        self.reset_button.setEnabled(False)
         self.update_console_message(s)
 
 
