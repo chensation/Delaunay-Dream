@@ -3,7 +3,6 @@ import sys
 import time
 import os
 import numpy as np
-from timeit import timeit
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -151,6 +150,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.clicked.connect(self.thread_process_video)
         self.open_button.clicked.connect(self.open_dialog)
         self.export_button.setEnabled(False)
+        self.apply_button.setEnabled(False)
         self.export_button.clicked.connect(self.thread_export_video)
         self.play_button.clicked.connect(self.on_play_clicked)
         self.stop_button.clicked.connect(self.on_pause_clicked)
@@ -167,10 +167,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     @_update_func
     def set_triangulation(self, triangulate):
         self.process.triangulate = triangulate
-
-    @_update_func # TODO: remove this after gui is ready
-    def set_frame_rate(self, frame_rate):
-        return  # not functional until framerate changes are in
 
     @_update_func
     def set_hue(self, hue):
@@ -248,6 +244,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.export_button.setEnabled(False)
         self.open_button.setEnabled(False)
+        self.apply_button.setEnabled(False)
 
     def on_applying(self, s):
         self.update_console_message(s)
@@ -259,6 +256,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.open_button.setEnabled(False)
         self.export_button.setEnabled(False)
+        self.apply_button.setEnabled(False)
 
     def on_apply_finished(self, s, vid, proc):
         self.update_console_message(s)
@@ -270,7 +268,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.export_button.setEnabled(True)
-    
+
     def on_load_finished(self, v, s):
         self.video = v
         if len(self.video.frames) == 0:
@@ -284,6 +282,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.have_file = True
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
+        self.apply_button.setEnabled(True)
         self.update_console_message(s)
 
 
@@ -291,6 +290,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
+        self.apply_button.setEnabled(True)
+
 
     # TODO: don't create a new object every time these functions are called
 
