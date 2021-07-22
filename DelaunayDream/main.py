@@ -31,6 +31,7 @@ class video_worker(QThread):
         self.curr_frame = None
         self.curr_frame_idx = -1
 
+
     def play_video(self, frame_index):
         #while loop to play from curr_frame to end
         i = frame_index
@@ -40,7 +41,6 @@ class video_worker(QThread):
                 self.pause_sig.emit(self.curr_frame)
                 #self.update_curr_frame.emit(self.curr_frame)
                 return
-            
             self.curr_frame_idx = i
             self.curr_frame = self.video.frames[i]
             self.update_slider_index.emit(self.curr_frame_idx)
@@ -256,10 +256,20 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def on_slider_released(self):
         if self.play:
             self.on_play_clicked()
+        else:
+            self.playback_thread.pause_sig.emit(self.playback_thread.curr_frame)
+            
     def on_stop(self):
+        self.play = False
+
+        if not self.playback_thread.pause:
+            self.playback_thread.pause = True
         self.playback_thread.curr_frame_idx = 0
         self.playback_thread.curr_frame = self.playback_thread.video.frames[0]
-        self.playback_thread.update_curr_frame.emit(self.playback_thread.curr_frame)
+        self.update_from_thread()
+
+        self.play_button.setText("Play")
+
         self.video_slider.setValue(0)
     def on_loading(self, s):
         self.update_console_message(s)
@@ -354,30 +364,13 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def on_play_clicked(self):
         self.playback_thread.pause = not self.playback_thread.pause
-        # self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
-        # self.playback_thread.pause_sig.connect(self.on_pause_sig)
         self.playback_thread.start()
 
-    #TODO: Connect to actual pause button
-    #currently connected to stop button
     def on_pause_sig(self, frame):
         image = self.process.apply_filters(frame)
         if self.process.triangulate:
             image = self.triangulation.apply_triangulation(image)
         self.set_curr_frame(image)
-
-    # def on_pause_clicked(self):
-
-    #     self.playback_thread.curr_frame = self.process.apply_filters(self.playback_thread.curr_frame)
-    #     if self.process.triangulate:
-    #         self.playback_thread.curr_frame = self.triangulation.apply_triangulation(self.playback_thread.curr_frame)
-    #     self.playback_thread.pause = True
-        
-    # def reset_filter(self):
-    #     self.process.triangulate = False
-    #     self.process.hue = 0
-    #     self.process.saturation = 1
-    #     self.process.brightness = 1
 
         
     def update_console_message(self, message):
