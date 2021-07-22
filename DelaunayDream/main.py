@@ -141,7 +141,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
         self.max_points_spinBox.valueChanged['int'].connect(self.set_num_pts)
-        self.poisson_disk_radioButton.toggled['bool'].connect(self.sampling_method)
+        self.poisson_disk_radioButton.toggled['bool'].connect(self.set_sampling_method)
         self.scale_factor_comboBox.highlighted['int'].connect(self.set_image_scale)
         self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
         self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
@@ -185,8 +185,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation.num_points = num
 
     @_update_func
-    def sampling_method(self, method):
-        print(method)
+    def set_sampling_method(self, method):
+        self.triangulation.pds = method
+        # print(method)
         # self.triangulation.threshold = threshold
 
     @_update_func
