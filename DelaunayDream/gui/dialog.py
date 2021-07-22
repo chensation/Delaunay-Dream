@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'dialog.ui'
+# Form implementation generated from reading ui file 'gui/dialog.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -98,6 +98,8 @@ class Ui_Dialog(object):
         self.horizontalLayout_3.addItem(spacerItem3)
         self.ok_button = QtWidgets.QPushButton(Dialog)
         self.ok_button.setEnabled(False)
+        self.ok_button.setMinimumSize(QtCore.QSize(75, 20))
+        self.ok_button.setMaximumSize(QtCore.QSize(75, 20))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
@@ -105,6 +107,8 @@ class Ui_Dialog(object):
         self.ok_button.setObjectName("ok_button")
         self.horizontalLayout_3.addWidget(self.ok_button)
         self.cancel_button = QtWidgets.QPushButton(Dialog)
+        self.cancel_button.setMinimumSize(QtCore.QSize(75, 20))
+        self.cancel_button.setMaximumSize(QtCore.QSize(75, 20))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
@@ -127,5 +131,5 @@ class Ui_Dialog(object):
         self.label.setText(_translate("Dialog", "Filename:"))
         self.browse_button.setText(_translate("Dialog", "Browse..."))
         self.label_2.setText(_translate("Dialog", "Select a Frame Rate:"))
-        self.ok_button.setText(_translate("Dialog", "Ok"))
+        self.ok_button.setText(_translate("Dialog", "OK"))
         self.cancel_button.setText(_translate("Dialog", "Cancel"))
