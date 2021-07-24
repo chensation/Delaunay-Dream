@@ -132,7 +132,7 @@ class Note:
         audio = AudioFileClip(filename).subclip(0,5)
         clip = ImageSequenceClip(list(frames), fps = 25).subclip(0,5)
         clip = clip.set_audio(audio)
-        clip.write_videofile("movie.mp4")
+        clip.write_videofile("../../../movie.avi", codec='png')
 
 
 if __name__ == '__main__':

@@ -88,7 +88,8 @@ class Video:
     def export_video(self, filename, have_color=True):
         clip = ImageSequenceClip(list(self._frames), fps = self._fps)
         clip = clip.set_audio(self._audio)
-        clip.write_videofile(filename, codec = self._fourcc)
+        print(self._fourcc)
+        clip.write_videofile(filename) # codec = self._fourcc
 
         # writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
         # for frame in self._frames:
