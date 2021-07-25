@@ -8,6 +8,7 @@ import moviepy
 from moviepy.editor import *
 
 from triangulation import Triangulation
+import re
 
 class Note:
     def __init__(self):
@@ -126,13 +127,24 @@ class Note:
         return np.array(outputFrames)
 
 
-    def combine_with_audio(self, frames, filename):
-        def returnFrame(i):
-            return frames[i]
-        audio = AudioFileClip(filename).subclip(0,5)
+    def combine_with_audio(self, inFname, outfilename):
+
+        frames = self.get_frames(inFname)
+
+        audio = AudioFileClip(inFname).subclip(0,5)
         clip = ImageSequenceClip(list(frames), fps = 25).subclip(0,5)
         clip = clip.set_audio(audio)
-        clip.write_videofile("../../../movie.avi", codec='png')
+        
+        ext = outfilename[-3:]
+
+        codecs = {
+            "avi":'rawvideo',
+            "wmv":'wmv2',
+            "mkv":'mpeg4',
+            "mp4":'libx264'
+        }
+
+        clip.write_videofile(outfilename, codec = codecs[ext])
 
 
 if __name__ == '__main__':
