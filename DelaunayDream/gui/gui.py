@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'DelaunayDream/gui/gui_7_18_21.ui'
+# Form implementation generated from reading ui file 'gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -30,6 +30,7 @@ class Ui_MainWindow(object):
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem1, 2, 4, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox_2.setEnabled(True)
         self.groupBox_2.setMinimumSize(QtCore.QSize(300, 0))
         self.groupBox_2.setMaximumSize(QtCore.QSize(300, 16777215))
         font = QtGui.QFont()
@@ -200,7 +201,7 @@ class Ui_MainWindow(object):
         self.triangulation_check_box.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.triangulation_check_box.setAutoFillBackground(True)
         self.triangulation_check_box.setText("")
-        self.triangulation_check_box.setChecked(True)
+        self.triangulation_check_box.setChecked(False)
         self.triangulation_check_box.setObjectName("triangulation_check_box")
         self.horizontalLayout_12.addWidget(self.triangulation_check_box)
         self.verticalLayout_5.addLayout(self.horizontalLayout_12)
@@ -217,7 +218,7 @@ class Ui_MainWindow(object):
         self.groupBox.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox.setObjectName("groupBox")
         self.triangulate_options = QtWidgets.QWidget(self.groupBox)
-        self.triangulate_options.setEnabled(True)
+        self.triangulate_options.setEnabled(False)
         self.triangulate_options.setGeometry(QtCore.QRect(10, 20, 260, 220))
         self.triangulate_options.setMinimumSize(QtCore.QSize(260, 220))
         self.triangulate_options.setMaximumSize(QtCore.QSize(260, 220))
