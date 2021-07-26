@@ -146,19 +146,20 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.play_button.clicked.connect(self.set_play_button)
         self.mode_toggle.toggled['bool'].connect(self.dark_light_mode)
 
+        # filter options
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
         self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
         self.brightness_spinBox.valueChanged['int'].connect(self.set_brightness)
-
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
         self.max_points_spinBox.valueChanged['int'].connect(self.set_num_pts)
         self.poisson_disk_radioButton.toggled['bool'].connect(self.set_sampling_method)
-        self.scale_factor_comboBox.highlighted['int'].connect(self.set_image_scale)
+        self.scale_factor_comboBox.currentTextChanged['QString'].connect(self.set_image_scale)
         self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
         self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
+        #video options
         self.apply_button.clicked.connect(self.thread_process_video)
-        self.reset_button.clicked.connect(self.thread_load_video)
+        self.reset_button.clicked.connect(self.on_reset_clicked)
         self.open_button.clicked.connect(self.open_dialog)
         self.export_button.setEnabled(False)
         self.apply_button.setEnabled(False)
@@ -197,22 +198,21 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     @_update_func
     def set_sampling_method(self, method):
-        if method == True:
+        if method:
             self.warning_dialogue.warning_message.setText("Poisson Disk significant slows down processing but results to \nbetter output")
             self.warning_dialogue.exec_()
         self.triangulation.pds = method
 
     @_update_func
     def set_image_scale(self, scale):
-        if scale == 0:
-            scale = 100
-        elif scale == 1:
-            scale = 50
-        elif scale == 2:
-            scale = 10
-        else:
-            scale = 1
-        self.triangulation.image_scale = scale
+        scale_num = int(scale[:-1])
+        if scale_num >= 50:
+            self.warning_dialogue.warning_message.setText("Although a higher image scale allows more accurate colors, "
+                                                          "it cause the triangulation to be much slower\n"
+                                                          f"Are you sure you want the image scale to be {scale}?")
+            self.warning_dialogue.exec_()
+
+        self.triangulation.image_scale = int(scale[:-1])
 
     @_update_func
     def set_line(self, line):
@@ -259,6 +259,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.setStyleSheet(StyleSheet().dark_mode)
             self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
 
+    def on_reset_clicked(self):
+        self.reset_filters()
+        self.thread_load_video()
+
     def on_loading(self, s):
         self.update_console_message(s)
         self.export_button.setEnabled(False)
@@ -288,6 +292,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.open_button.setEnabled(True)
         self.export_button.setEnabled(True)
         self.reset_button.setEnabled(True)
+        self.reset_filters()
 
     def on_load_finished(self, v, s):
         self.video = v
@@ -336,13 +341,16 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_worker.start()
 
     def thread_export_video(self):
-        if self.applied_changes == False:
+        if not self.applied_changes:
             message = "The \"Apply To All Frames\" button has not been clicked.\nNo options have been applied."
             self.warning_dialogue.warning_message.setText(message)
             self.warning_dialogue.exec_()        
-        self.update_console_message("Enter filename and extension...")
         file_filter = '.avi;; .wmv;; .mkv;; .mp4'
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
+        if output_filename is None or output_filename == "":
+            self.update_console_message("")
+            return
+
         self.export_worker = export_worker(self.video, output_filename, extension)
         self.export_worker.export_in_process.connect(self.on_exporting)
         self.export_worker.export_finished.connect(self.on_export_finished)
@@ -374,6 +382,17 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def update_console_message(self, message):
         self.status_message.setText(message)
 
+    def reset_filters(self):
+        self.hue_spinBox.setValue(0)
+        self.saturation_spinBox.setValue(100)
+        self.brightness_spinBox.setValue(100)
+        self.max_points_spinBox.setValue(2000)
+        self.triangulation_check_box.setChecked(False)
+        self.threshold_radioButton.setChecked(True)
+        self.poisson_disk_radioButton.setChecked(False)
+        self.scale_factor_comboBox.setCurrentIndex(1)
+        self.draw_line_checkBox.setChecked(False)
+        self.thickness_spinBox.setValue(1)
 
 
 def main():

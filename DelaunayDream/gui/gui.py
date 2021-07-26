@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'DelaunayDream/gui/gui_7_18_21.ui'
+# Form implementation generated from reading ui file 'gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -30,6 +30,7 @@ class Ui_MainWindow(object):
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem1, 2, 4, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox_2.setEnabled(True)
         self.groupBox_2.setMinimumSize(QtCore.QSize(300, 0))
         self.groupBox_2.setMaximumSize(QtCore.QSize(300, 16777215))
         font = QtGui.QFont()
@@ -200,7 +201,7 @@ class Ui_MainWindow(object):
         self.triangulation_check_box.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.triangulation_check_box.setAutoFillBackground(True)
         self.triangulation_check_box.setText("")
-        self.triangulation_check_box.setChecked(True)
+        self.triangulation_check_box.setChecked(False)
         self.triangulation_check_box.setObjectName("triangulation_check_box")
         self.horizontalLayout_12.addWidget(self.triangulation_check_box)
         self.verticalLayout_5.addLayout(self.horizontalLayout_12)
@@ -217,7 +218,7 @@ class Ui_MainWindow(object):
         self.groupBox.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox.setObjectName("groupBox")
         self.triangulate_options = QtWidgets.QWidget(self.groupBox)
-        self.triangulate_options.setEnabled(True)
+        self.triangulate_options.setEnabled(False)
         self.triangulate_options.setGeometry(QtCore.QRect(10, 20, 260, 220))
         self.triangulate_options.setMinimumSize(QtCore.QSize(260, 220))
         self.triangulate_options.setMaximumSize(QtCore.QSize(260, 220))
@@ -304,6 +305,7 @@ class Ui_MainWindow(object):
         self.scale_factor_comboBox.setFont(font)
         self.scale_factor_comboBox.setInputMethodHints(QtCore.Qt.ImhNone)
         self.scale_factor_comboBox.setObjectName("scale_factor_comboBox")
+        self.scale_factor_comboBox.addItem("")
         self.scale_factor_comboBox.addItem("")
         self.scale_factor_comboBox.addItem("")
         self.scale_factor_comboBox.addItem("")
@@ -515,7 +517,7 @@ class Ui_MainWindow(object):
         self.actionNew_Window.setObjectName("actionNew_Window")
 
         self.retranslateUi(MainWindow)
-        self.scale_factor_comboBox.setCurrentIndex(2)
+        self.scale_factor_comboBox.setCurrentIndex(1)
         self.hue_spinBox.valueChanged['int'].connect(self.hue_slider.setValue)
         self.hue_slider.valueChanged['int'].connect(self.hue_spinBox.setValue)
         self.saturation_slider.valueChanged['int'].connect(self.saturation_spinBox.setValue)
@@ -566,10 +568,11 @@ class Ui_MainWindow(object):
         self.scale_factor_label.setText(_translate("MainWindow", "Scale Factor"))
         self.scale_factor_comboBox.setStatusTip(_translate("MainWindow", "Scale Factor Selection"))
         self.scale_factor_comboBox.setCurrentText(_translate("MainWindow", "10%"))
-        self.scale_factor_comboBox.setItemText(0, _translate("MainWindow", "100%"))
-        self.scale_factor_comboBox.setItemText(1, _translate("MainWindow", "50%"))
-        self.scale_factor_comboBox.setItemText(2, _translate("MainWindow", "10%"))
-        self.scale_factor_comboBox.setItemText(3, _translate("MainWindow", "1%"))
+        self.scale_factor_comboBox.setItemText(0, _translate("MainWindow", "5%"))
+        self.scale_factor_comboBox.setItemText(1, _translate("MainWindow", "10%"))
+        self.scale_factor_comboBox.setItemText(2, _translate("MainWindow", "20%"))
+        self.scale_factor_comboBox.setItemText(3, _translate("MainWindow", "50%"))
+        self.scale_factor_comboBox.setItemText(4, _translate("MainWindow", "100%"))
         self.draw_line_checkBox.setStatusTip(_translate("MainWindow", "Draw Line"))
         self.label.setText(_translate("MainWindow", "Draw Line"))
         self.thickness_label.setStatusTip(_translate("MainWindow", "Thickness"))
@@ -587,7 +590,7 @@ class Ui_MainWindow(object):
         self.export_button.setStatusTip(_translate("MainWindow", "Export Video"))
         self.export_button.setText(_translate("MainWindow", "Export"))
         self.apply_button.setStatusTip(_translate("MainWindow", "Apply Changes to All Frames"))
-        self.apply_button.setText(_translate("MainWindow", "Apply to All Frames"))
+        self.apply_button.setText(_translate("MainWindow", "Apply to Full Video"))
         self.reset_button.setStatusTip(_translate("MainWindow", "Reset all changes applied to the video by reloading the video"))
         self.reset_button.setText(_translate("MainWindow", "Reset"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
