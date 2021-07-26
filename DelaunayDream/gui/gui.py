@@ -200,10 +200,7 @@ class Ui_MainWindow(object):
         self.triangulation_check_box.setFont(font)
         self.triangulation_check_box.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.triangulation_check_box.setAutoFillBackground(True)
-<<<<<<< HEAD
-=======
         self.triangulation_check_box.setText("")
->>>>>>> main
         self.triangulation_check_box.setChecked(False)
         self.triangulation_check_box.setObjectName("triangulation_check_box")
         self.horizontalLayout_12.addWidget(self.triangulation_check_box)
@@ -221,17 +218,10 @@ class Ui_MainWindow(object):
         self.groupBox.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox.setObjectName("groupBox")
         self.triangulate_options = QtWidgets.QWidget(self.groupBox)
-<<<<<<< HEAD
-        self.triangulate_options.setEnabled(self.triangulation_check_box.isChecked())
-        self.triangulate_options.setGeometry(QtCore.QRect(10, 20, 300, 240))
-        self.triangulate_options.setMinimumSize(QtCore.QSize(300, 240))
-        self.triangulate_options.setMaximumSize(QtCore.QSize(300, 240))
-=======
         self.triangulate_options.setEnabled(False)
         self.triangulate_options.setGeometry(QtCore.QRect(10, 20, 260, 220))
         self.triangulate_options.setMinimumSize(QtCore.QSize(260, 220))
         self.triangulate_options.setMaximumSize(QtCore.QSize(260, 220))
->>>>>>> main
         self.triangulate_options.setObjectName("triangulate_options")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.triangulate_options)
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
