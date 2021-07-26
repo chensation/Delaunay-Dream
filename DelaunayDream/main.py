@@ -3,7 +3,6 @@ import sys
 import time
 import os
 import numpy as np
-from timeit import timeit
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -14,7 +13,7 @@ from DelaunayDream.triangulation.triangulation import Triangulation
 from DelaunayDream.videopipe.video import Video
 from DelaunayDream.videopipe.process import Process
 from DelaunayDream.file_dialogue import FileDialogue
-
+from DelaunayDream.warning_dialogue import WarningDialogue
 
 
 """ Thread for video player
@@ -117,8 +116,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         self.process = Process(triangulate=self.triangulation_check_box.isChecked())
-        self.triangulation = Triangulation(image_scale=self.scale_factor_spinBox.value()/100)
+        self.triangulation = Triangulation(image_scale=10/100)
         self.have_file = False
+        self.applied_changes = False
 
         self.video = Video()
         self.playback_thread = video_worker(self.video)
@@ -128,32 +128,47 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         ####Octavio's Changes####
         self.play = False
         self.temp_filename = ""
-        self.width = self.height = 0
-        self.mode = False
 
-        # Pop-up Dialog       
+        # GUI Setup
+        self.triangulation_check_box._handle_checked_brush.setColor(QtGui.QColor('#b4b4b4'))
+        self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
+        self.mode_toggle._bar_brush.setColor(QtGui.QColor('#135680'))
+        self.mode_toggle._handle_brush.setColor(QtGui.QColor('#b4b4b4'))
+        self.mode_toggle._bar_checked_brush.setColor(QtGui.QColor('#973680'))
+        self.mode_toggle._handle_checked_brush.setColor(QtGui.QColor('#b4b4b4'))
+        self.mode_toggle._pulse_unchecked_animation = QtGui.QBrush(QtGui.QColor('#444AB9AF'))
+        self.mode_toggle._pulse_checked_animation = QtGui.QBrush(QtGui.QColor('#44EBCAB5'))
+        self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+        self.stop_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaStop))
+        self.play = True
+        self.width = self.height = 0
+
+        # Pop-up Dialog  
+        self.warning_dialogue = WarningDialogue()     
         self.file_dialogue = FileDialogue(self.video)
         self.file_dialogue.ok_button.clicked.connect(self.thread_load_video)
 
         #Video Playback
         self.play_button.clicked.connect(self.set_play_button)
-        #self.stop_button.clicked.connect(self.dark_light_mode)
-        #########################
+        self.mode_toggle.toggled['bool'].connect(self.dark_light_mode)
 
+        # filter options
         self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
         self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
         self.brightness_spinBox.valueChanged['int'].connect(self.set_brightness)
-
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
         self.max_points_spinBox.valueChanged['int'].connect(self.set_num_pts)
-        self.threshold_spinBox.valueChanged['double'].connect(self.set_threshold)
-        self.scale_factor_spinBox.valueChanged['int'].connect(self.set_image_scale)
+        self.poisson_disk_radioButton.toggled['bool'].connect(self.set_sampling_method)
+        self.scale_factor_comboBox.currentTextChanged['QString'].connect(self.set_image_scale)
         self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
         self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
+        #video options
         self.apply_button.clicked.connect(self.thread_process_video)
-        self.open_button.clicked.connect(self.open_dialog) ####Octavio's Changes####
+        self.reset_button.clicked.connect(self.on_reset_clicked)
+        self.open_button.clicked.connect(self.open_dialog)
         self.export_button.setEnabled(False)
+        self.apply_button.setEnabled(False)
         self.export_button.clicked.connect(self.thread_export_video)
         self.play_button.clicked.connect(self.on_play_clicked)
         #self.stop_button.clicked.connect(self.on_pause_clicked)
@@ -176,10 +191,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def set_triangulation(self, triangulate):
         self.process.triangulate = triangulate
 
-    @_update_func # TODO: remove this after gui is ready
-    def set_frame_rate(self, frame_rate):
-        return  # not functional until framerate changes are in
-
     @_update_func
     def set_hue(self, hue):
         self.process.hue = hue
@@ -197,12 +208,22 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation.num_points = num
 
     @_update_func
-    def set_threshold(self, threshold):
-        self.triangulation.threshold = threshold
+    def set_sampling_method(self, method):
+        if method:
+            self.warning_dialogue.warning_message.setText("Poisson Disk significant slows down processing but results to \nbetter output")
+            self.warning_dialogue.exec_()
+        self.triangulation.pds = method
 
     @_update_func
     def set_image_scale(self, scale):
-        self.triangulation.image_scale = scale
+        scale_num = int(scale[:-1])
+        if scale_num >= 50:
+            self.warning_dialogue.warning_message.setText("Although a higher image scale allows more accurate colors, "
+                                                          "it cause the triangulation to be much slower\n"
+                                                          f"Are you sure you want the image scale to be {scale}?")
+            self.warning_dialogue.exec_()
+
+        self.triangulation.image_scale = int(scale[:-1])
 
     @_update_func
     def set_line(self, line):
@@ -212,6 +233,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def set_line_thickness(self, thickness):
         self.triangulation.line_thickness = thickness
 
+    @_update_func
+    def resizeEvent(self, event):
+        self.width = self.video_player.width()
+        self.height = self.video_player.height()
+
     def update_from_thread(self):
         image = self.process.apply_filters(self.playback_thread.curr_frame)
 
@@ -220,13 +246,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.set_curr_frame(image)
     
-    def resizeEvent(self, event):
-        self.width = self.video_player.width()
-        self.height = self.video_player.height()
 
     def open_dialog(self):
         self.file_dialogue.exec_()
-
+    
     def set_play_button(self):
         self.play = not self.play   #toggle state first
         if self.play:
@@ -246,6 +269,28 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.playback_thread.curr_frame_idx = index
         self.playback_thread.curr_frame = self.playback_thread.video.frames[index]
         self.playback_thread.update_curr_frame.emit(self.playback_thread.curr_frame)
+        if self.play == True:
+            self.play = False
+            self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPause))
+        else:
+            self.play = True
+            self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+    
+    def dark_light_mode(self, mode):
+        if mode == True: 
+            self.setStyleSheet(StyleSheet().light_mode)
+            self.file_dialogue.setStyleSheet(StyleSheet().light_mode)
+            self.warning_dialogue.setStyleSheet(StyleSheet().light_mode)
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#973680'))
+        else:
+            self.file_dialogue.setStyleSheet(StyleSheet().dark_mode)
+            self.warning_dialogue.setStyleSheet(StyleSheet().dark_mode)
+            self.setStyleSheet(StyleSheet().dark_mode)
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
+
+    def on_reset_clicked(self):
+        self.reset_filters()
+        self.thread_load_video()
 
     def update_video_slider(self, index):
         self.video_slider.setValue(index)
@@ -275,6 +320,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.export_button.setEnabled(False)
         self.open_button.setEnabled(False)
+        self.apply_button.setEnabled(False)
 
     def on_applying(self, s):
         self.update_console_message(s)
@@ -286,6 +332,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.open_button.setEnabled(False)
         self.export_button.setEnabled(False)
+        self.apply_button.setEnabled(False)
 
     def on_apply_finished(self, s, vid, proc):
         self.update_console_message(s)
@@ -297,7 +344,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.export_button.setEnabled(True)
-    
+        self.reset_button.setEnabled(True)
+        self.reset_filters()
+
     def on_load_finished(self, v, s):
         self.video = v
         if len(self.video.frames) == 0:
@@ -314,6 +363,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.video_slider.setMaximum(len(self.video.frames) - 1)
         self.video_slider.setMinimum(0)
         self.video_slider.setValue(0)
+        self.apply_button.setEnabled(True)
+        self.reset_button.setEnabled(False)
         self.update_console_message(s)
 
 
@@ -321,6 +372,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
+        self.apply_button.setEnabled(True)
+
 
     # TODO: don't create a new object every time these functions are called
 
@@ -344,9 +397,16 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_worker.start()
 
     def thread_export_video(self):
-        self.update_console_message("Enter filename and extension...")
+        if not self.applied_changes:
+            message = "The \"Apply To All Frames\" button has not been clicked.\nNo options have been applied."
+            self.warning_dialogue.warning_message.setText(message)
+            self.warning_dialogue.exec_()        
         file_filter = '.avi;; .wmv;; .mkv;; .mp4'
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
+        if output_filename is None or output_filename == "":
+            self.update_console_message("")
+            return
+
         self.export_worker = export_worker(self.video, output_filename, extension)
         self.export_worker.export_in_process.connect(self.on_exporting)
         self.export_worker.export_finished.connect(self.on_export_finished)
@@ -376,11 +436,22 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def update_console_message(self, message):
         self.status_message.setText(message)
 
+    def reset_filters(self):
+        self.hue_spinBox.setValue(0)
+        self.saturation_spinBox.setValue(100)
+        self.brightness_spinBox.setValue(100)
+        self.max_points_spinBox.setValue(2000)
+        self.triangulation_check_box.setChecked(False)
+        self.threshold_radioButton.setChecked(True)
+        self.poisson_disk_radioButton.setChecked(False)
+        self.scale_factor_comboBox.setCurrentIndex(1)
+        self.draw_line_checkBox.setChecked(False)
+        self.thickness_spinBox.setValue(1)
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    app.setStyleSheet(StyleSheet().light_mode)
+    app.setStyleSheet(StyleSheet().dark_mode)
     gui = GuiWindow()
     gui.show()
     sys.exit(app.exec_())

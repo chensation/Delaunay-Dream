@@ -20,7 +20,7 @@ setup(
     include_package_data=True,
     ext_modules=cythonize(extensions),
     # Make sure to add the libraries we use here.
-    install_requires=["numpy", "opencv-contrib-python", "pyqt5==5.14"],
+    install_requires=["numpy", "opencv-contrib-python", "pyqt5==5.14", "qtwidgets", "moviepy"],
     entry_points={
         "console_scripts": [
             "delaunaydream = DelaunayDream.main:main",

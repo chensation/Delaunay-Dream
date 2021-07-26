@@ -1,9 +1,9 @@
 import cv2 as cv
 import math
-import multiprocessing
 from multiprocessing import shared_memory
 import multiprocessing as mp
 import numpy as np
+from moviepy.editor import *
 
 
 class Video:
@@ -14,6 +14,7 @@ class Video:
         
         self._video_size = ()
         self._frames = ()
+        self._audio = ()
         self._filename = name
 
     @property
@@ -80,13 +81,33 @@ class Video:
 
         cap.release()
         self._frames = np.asarray(temp_array)
+        self._audio = AudioFileClip(self._filename)
+
 
     def export_video(self, filename, have_color=True):
-        writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
-        for frame in self._frames:
-            writer.write(frame)
 
-        writer.release()
+        ext = filename[-3:]
+        rgbframes = self.frames.copy()
+        if(not ext == "avi"):
+            rgbframes[:,:,:,0] = self.frames[:,:,:,2]
+            rgbframes[:,:,:,2] = self.frames[:,:,:,0]
+        clip = ImageSequenceClip(list(rgbframes), fps = self._fps)
+        clip = clip.set_audio(self._audio)
+
+       
+        codecs = {
+            "avi":'rawvideo',
+            "wmv":'wmv2',
+            "mkv":'mpeg4',
+            "mp4":'libx264'
+        }
+
+        clip.write_videofile(filename,fps = self._fps, codec = codecs[ext])
+
+        # writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
+        # for frame in self._frames:
+        #     writer.write(frame)
+        # writer.release()
 
     def process_video(self, func):
 
@@ -99,10 +120,10 @@ class Video:
         shared_array[:] = self._frames[:]
         self._frames = ()
 
-        Q1out = multiprocessing.Process(target=process_shared_mem, args=(func, shm.name, 0, Q1, shared_array.shape, shared_array.dtype))
-        Q2out = multiprocessing.Process(target=process_shared_mem, args=(func, shm.name, Q1, Q2, shared_array.shape, shared_array.dtype))
-        Q3out = multiprocessing.Process(target=process_shared_mem, args=(func, shm.name, Q2, Q3, shared_array.shape, shared_array.dtype))
-        Q4out = multiprocessing.Process(target=process_shared_mem, args=(func, shm.name, Q3, shared_array.shape[0], shared_array.shape, shared_array.dtype))
+        Q1out = mp.Process(target=process_shared_mem, args=(func, shm.name, 0, Q1, shared_array.shape, shared_array.dtype))
+        Q2out = mp.Process(target=process_shared_mem, args=(func, shm.name, Q1, Q2, shared_array.shape, shared_array.dtype))
+        Q3out = mp.Process(target=process_shared_mem, args=(func, shm.name, Q2, Q3, shared_array.shape, shared_array.dtype))
+        Q4out = mp.Process(target=process_shared_mem, args=(func, shm.name, Q3, shared_array.shape[0], shared_array.shape, shared_array.dtype))
 
         Q1out.start()
         Q2out.start()
