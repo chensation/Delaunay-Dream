@@ -4,7 +4,8 @@ __pycache__/
 *.so
 /dist/
 DelaunayDream.egg-info/
-
-.vscode/settings.json
+/.vscode/
 *.avi
 *.mp4
+*.mp3
+*.cpp

@@ -1,6 +1,5 @@
 import cv2 as cv
 import math
-import multiprocessing
 from multiprocessing import shared_memory
 import multiprocessing as mp
 import numpy as np
@@ -121,10 +120,10 @@ class Video:
         shared_array[:] = self._frames[:]
         self._frames = ()
 
-        Q1out = multiprocessing.Process(target=process_shared_mem, args=(func, shm.name, 0, Q1, shared_array.shape, shared_array.dtype))
-        Q2out = multiprocessing.Process(target=process_shared_mem, args=(func, shm.name, Q1, Q2, shared_array.shape, shared_array.dtype))
-        Q3out = multiprocessing.Process(target=process_shared_mem, args=(func, shm.name, Q2, Q3, shared_array.shape, shared_array.dtype))
-        Q4out = multiprocessing.Process(target=process_shared_mem, args=(func, shm.name, Q3, shared_array.shape[0], shared_array.shape, shared_array.dtype))
+        Q1out = mp.Process(target=process_shared_mem, args=(func, shm.name, 0, Q1, shared_array.shape, shared_array.dtype))
+        Q2out = mp.Process(target=process_shared_mem, args=(func, shm.name, Q1, Q2, shared_array.shape, shared_array.dtype))
+        Q3out = mp.Process(target=process_shared_mem, args=(func, shm.name, Q2, Q3, shared_array.shape, shared_array.dtype))
+        Q4out = mp.Process(target=process_shared_mem, args=(func, shm.name, Q3, shared_array.shape[0], shared_array.shape, shared_array.dtype))
 
         Q1out.start()
         Q2out.start()
