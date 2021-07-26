@@ -153,7 +153,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
         self.max_points_spinBox.valueChanged['int'].connect(self.set_num_pts)
         self.poisson_disk_radioButton.toggled['bool'].connect(self.set_sampling_method)
-        self.scale_factor_comboBox.highlighted['int'].connect(self.set_image_scale)
+        self.scale_factor_comboBox.currentTextChanged['QString'].connect(self.set_image_scale)
         self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
         self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
 
@@ -204,15 +204,14 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     @_update_func
     def set_image_scale(self, scale):
-        if scale == 0:
-            scale = 100
-        elif scale == 1:
-            scale = 50
-        elif scale == 2:
-            scale = 10
-        else:
-            scale = 1
-        self.triangulation.image_scale = scale
+        scale_num = int(scale[:-1])
+        if scale_num >= 50:
+            self.warning_dialogue.warning_message.setText("Although a higher image scale allows more accurate colors, "
+                                                          "it cause the triangulation to be much slower\n"
+                                                          f"Are you sure you want the image scale to be {scale}?")
+            self.warning_dialogue.exec_()
+
+        self.triangulation.image_scale = int(scale[:-1])
 
     @_update_func
     def set_line(self, line):

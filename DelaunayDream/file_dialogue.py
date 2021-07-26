@@ -13,7 +13,7 @@ class FileDialogue(Ui_Dialog, QtWidgets.QDialog):
         self.file_lineEdit.textChanged[str].connect(self.file_text_changed)
         self.file_lineEdit.editingFinished.connect(self.confirm_file)
 
-        self.frame_rate_selector.highlighted['QString'].connect(self.set_frame_rate)
+        self.frame_rate_selector.currentTextChanged['QString'].connect(self.set_frame_rate)
         self.ok_button.clicked.connect(self.close)
         self.cancel_button.clicked.connect(self.close)
 
