@@ -336,13 +336,16 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_worker.start()
 
     def thread_export_video(self):
-        if self.applied_changes == False:
+        if not self.applied_changes:
             message = "The \"Apply To All Frames\" button has not been clicked.\nNo options have been applied."
             self.warning_dialogue.warning_message.setText(message)
             self.warning_dialogue.exec_()        
-        self.update_console_message("Enter filename and extension...")
         file_filter = '.avi;; .wmv;; .mkv;; .mp4'
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
+        if output_filename is None or output_filename == "":
+            self.update_console_message("")
+            return
+
         self.export_worker = export_worker(self.video, output_filename, extension)
         self.export_worker.export_in_process.connect(self.on_exporting)
         self.export_worker.export_finished.connect(self.on_export_finished)
