@@ -590,7 +590,7 @@ class Ui_MainWindow(object):
         self.export_button.setStatusTip(_translate("MainWindow", "Export Video"))
         self.export_button.setText(_translate("MainWindow", "Export"))
         self.apply_button.setStatusTip(_translate("MainWindow", "Apply Changes to All Frames"))
-        self.apply_button.setText(_translate("MainWindow", "Apply to All Frames"))
+        self.apply_button.setText(_translate("MainWindow", "Apply to Full Video"))
         self.reset_button.setStatusTip(_translate("MainWindow", "Reset all changes applied to the video by reloading the video"))
         self.reset_button.setText(_translate("MainWindow", "Reset"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
