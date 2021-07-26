@@ -8,7 +8,7 @@ def rotate_hue(val, deg):
 
 class Process:
 
-    def __init__(self, triangulate=False, frame_rate=0, hue=0, saturation=1, brightness=1):
+    def __init__(self, triangulate=False, hue=0, saturation=1, brightness=1):
         self.__triangulate = triangulate
         self.__hue = hue
         self.__saturation = saturation
