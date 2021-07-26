@@ -1544,7 +1544,7 @@
          <string>Apply Changes to All Frames</string>
         </property>
         <property name="text">
-         <string>Apply to All Frames</string>
+         <string>Apply to Full Video</string>
         </property>
        </widget>
       </item>
