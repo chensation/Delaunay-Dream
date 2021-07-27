@@ -102,9 +102,9 @@ class Video:
 
        
         codecs = {
-            "avi":'rawvideo',
+            "avi":'libx264',
             "wmv":'wmv2',
-            "mkv":'mpeg4',
+            "mkv":'libx264',
             "mp4":'libx264'
         }
 
