@@ -39,6 +39,8 @@ class FileDialogue(Ui_Dialog, QtWidgets.QDialog):
 
         except Exception as err:
             self.warning_msg.setText(str(err))
+            self.frame_rate_selector.clear()
+            self.ok_button.setEnabled(False)
 
     def set_frame_rate(self, fps):
 

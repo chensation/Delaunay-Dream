@@ -39,11 +39,17 @@ class Video:
 
     def get_fps_from_file(self):
 
+        result = cv.imread(self._filename)
+
+        if result is not None:
+            raise ValueError("Invalid file type")
+
         cap = cv.VideoCapture(self._filename)
         success, _ = cap.read()
 
         if not success:
             raise ValueError("Unable to open file")
+
 
         fps =  math.ceil(cap.get(cv.CAP_PROP_FPS))
         cap.release()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'gui.ui'
+# Form implementation generated from reading ui file 'DelaunayDream/gui/gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -424,6 +424,7 @@ class Ui_MainWindow(object):
         self.video_player.setObjectName("video_player")
         self.verticalLayout_6.addWidget(self.video_player)
         self.video_slider = QtWidgets.QSlider(self.centralwidget)
+        self.video_slider.setEnabled(False)
         self.video_slider.setMinimumSize(QtCore.QSize(854, 20))
         self.video_slider.setMaximumSize(QtCore.QSize(1920, 16777215))
         self.video_slider.setOrientation(QtCore.Qt.Horizontal)
