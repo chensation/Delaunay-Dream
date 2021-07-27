@@ -66,9 +66,9 @@
      </spacer>
     </item>
     <item row="0" column="3" rowspan="4">
-     <widget class="QGroupBox" name="groupBox_2">
+     <widget class="QGroupBox" name="all_options">
       <property name="enabled">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="minimumSize">
        <size>
@@ -572,7 +572,7 @@
          <item>
           <widget class="Toggle" name="triangulation_check_box">
            <property name="enabled">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="minimumSize">
             <size>
@@ -633,7 +633,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="enabled">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="minimumSize">
           <size>
@@ -1334,7 +1334,7 @@
       </item>
       <item>
        <widget class="QSlider" name="video_slider">
-       <property name="enabled">
+        <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="minimumSize">
@@ -1374,6 +1374,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="play_button">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>40</width>
@@ -1418,6 +1421,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="stop_button">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>40</width>
@@ -1493,6 +1499,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="export_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -1525,6 +1534,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout_14">
       <item>
        <widget class="QPushButton" name="apply_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>

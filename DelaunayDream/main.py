@@ -15,7 +15,26 @@ from DelaunayDream.file_dialogue import FileDialogue
 from DelaunayDream.warning_dialogue import WarningDialogue
 
 
+def reconnect(signal, new_handler=None):
+    """
+    helper function for reconnecting pyqt slots
+    :param signal: qt signal
+    :param new_handler: new function to be connected to it
+    :return:
+    """
+    try:
+        while True:
+            signal.disconnect()
+    except TypeError:
+        pass
+    if new_handler is not None:
+        signal.connect(new_handler)
+
+
 class GeneralWorker(QThread):
+    """
+    general use QtThread worker
+    """
     in_process = pyqtSignal(str)
     finished = pyqtSignal(str)
 
@@ -31,11 +50,10 @@ class GeneralWorker(QThread):
         self.finished.emit(self.finished_str)
 
 
-""" Thread for video player
-"""
-
-
 class VideoWorker(QThread):
+    """ Thread for video player
+    """
+
     play_in_process = pyqtSignal(str)
     update_slider_index = pyqtSignal(int)
     update_curr_frame = pyqtSignal(np.ndarray)
@@ -125,8 +143,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.clicked.connect(self.thread_process_video)
         self.reset_button.clicked.connect(self.on_reset_clicked)
         self.open_button.clicked.connect(self.open_dialog)
-        self.export_button.setEnabled(False)
-        self.apply_button.setEnabled(False)
         self.export_button.clicked.connect(self.thread_export_video)
 
     # setter functions
@@ -135,7 +151,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         def inner(self, *args, **kwargs):
             func(self, *args, *kwargs)
             if self.have_file and not self.play:
-                self.display_preview_from_playback()
+                self.thread_update_preview()
 
         return inner
 
@@ -191,6 +207,45 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.width = self.video_player.width()
         self.height = self.video_player.height()
 
+    ### filter functions ###
+
+    def on_reset_clicked(self):
+        self.reset_filters()
+        self.thread_load_video()
+
+    def reset_filters(self):
+        self.hue_spinBox.setValue(0)
+        self.saturation_spinBox.setValue(100)
+        self.brightness_spinBox.setValue(100)
+        self.max_points_spinBox.setValue(2000)
+        self.triangulation_check_box.setChecked(False)
+        self.threshold_radioButton.setChecked(True)
+        self.poisson_disk_radioButton.setChecked(False)
+        self.scale_factor_comboBox.setCurrentIndex(1)
+        self.draw_line_checkBox.setChecked(False)
+        self.thickness_spinBox.setValue(1)
+
+    def disable_options(self, s):
+        self.update_console_message(s)
+        self.export_button.setEnabled(False)
+        self.open_button.setEnabled(False)
+        self.apply_button.setEnabled(False)
+        self.video_slider.setEnabled(False)
+        self.play_button.setEnabled(False)
+        self.stop_button.setEnabled(False)
+        self.reset_button.setEnabled(False)
+        self.all_options.setEnabled(False)
+
+    def enable_options(self):
+        self.export_button.setEnabled(True)
+        self.open_button.setEnabled(True)
+        self.apply_button.setEnabled(True)
+        self.video_slider.setEnabled(True)
+        self.play_button.setEnabled(True)
+        self.stop_button.setEnabled(True)
+        self.reset_button.setEnabled(True)
+        self.all_options.setEnabled(True)
+
     # appearance functions
 
     def dark_light_mode(self, mode):
@@ -222,7 +277,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         if self.play:
             self.playback_thread.start()
         else:
-            self.display_preview_from_playback()
+            self.thread_update_preview()
 
     def update_thread_index(self, index):
         self.playback_thread.curr_frame_idx = index
@@ -238,7 +293,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
                 self.playback_thread.start()
             else:
                 self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
-                self.display_preview_from_playback()
+                self.thread_update_preview()
 
     def on_stop(self):
         if self.have_file:
@@ -250,7 +305,18 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
             self.video_slider.setValue(0)
             self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
-            self.display_preview_from_playback()
+            self.thread_update_preview()
+
+    def thread_update_preview(self):
+        reconnect(self.worker.in_process, self.on_preview_updating)
+        reconnect(self.worker.finished, None)
+
+        self.worker.func = self.display_preview_from_playback
+        self.worker.in_process_str = "PROCESSING PREVIEW..."
+        self.worker.start()
+
+    def on_preview_updating(self, s):
+        self.video_player.setText(s)
 
     ### file functions ###
 
@@ -264,8 +330,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def thread_load_video(self):
         try:
-            self.worker.in_process.connect(self.on_loading)
-            self.worker.finished.connect(self.on_load_finished)
+            reconnect(self.worker.in_process, self.disable_options)
+            reconnect(self.worker.finished, self.on_load_finished)
             self.worker.func = self.video.load_frames
             self.worker.in_process_str = f"Loading frames from {os.path.basename(self.video.filename)}..."
             self.worker.finished_str = f"All frames from {os.path.basename(self.video.filename)} loaded and ready"
@@ -277,8 +343,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.open_button.setEnabled(True)
 
     def thread_process_video(self):
-        self.worker.in_process.connect(self.on_applying)
-        self.worker.finished.connect(self.on_apply_finished)
+        reconnect(self.worker.in_process, self.disable_options)
+        reconnect(self.worker.finished, self.on_apply_finished)
         self.worker.func = self.process_video
         self.worker.in_process_str = "Applying changes to all frames, please wait..."
         self.worker.finished_str = "All frames processed"
@@ -299,28 +365,12 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         def export():
             self.video.export_video(output_filename + extension)
 
-        self.worker.in_process.connect(self.on_exporting)
-        self.worker.finished.connect(self.on_export_finished)
+        reconnect(self.worker.in_process, self.on_exporting)
+        reconnect(self.worker.finished, self.on_export_finished)
         self.worker.func = export
         self.worker.in_process_str = f"Writing to {os.path.basename(output_filename + extension)}..."
         self.worker.finished_str = "Write finished, go take a look"
         self.worker.start()
-
-    def on_loading(self, s):
-        self.update_console_message(s)
-        self.export_button.setEnabled(False)
-        self.open_button.setEnabled(False)
-        self.apply_button.setEnabled(False)
-        self.video_slider.setEnabled(False)
-
-    def on_applying(self, s):
-        self.update_console_message(s)
-        self.apply_button.setEnabled(False)
-        self.open_button.setEnabled(False)
-        self.export_button.setEnabled(False)
-        self.video_slider.setEnabled(False)
-        self.play_button.setEnabled(False)
-        self.stop_button.setEnabled(False)
 
     def on_exporting(self, s):
         self.update_console_message(s)
@@ -332,34 +382,33 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.update_console_message(s)
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
         self.set_curr_frame(self.playback_thread.curr_frame)
-        self.apply_button.setEnabled(True)
-        self.open_button.setEnabled(True)
-        self.export_button.setEnabled(True)
-        self.reset_button.setEnabled(True)
-        self.video_slider.setEnabled(True)
-        self.play_button.setEnabled(True)
-        self.stop_button.setEnabled(True)
+        self.enable_options()
         self.reset_filters()
 
     def on_load_finished(self, s):
         if len(self.video.frames) == 0:
             self.update_console_message("No file loaded")
+            self.open_button.setEnabled(True)
+            if self.have_file:
+                self.export_button.setEnabled(True)
+                self.apply_button.setEnabled(True)
+                self.video_slider.setEnabled(True)
+                self.play_button.setEnabled(True)
+                self.stop_button.setEnabled(True)
+
             return
 
         self.playback_thread.video = self.video
         self.playback_thread.curr_frame_idx = 0
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
         self.have_file = True
-        self.video_slider.setEnabled(True)
-        self.export_button.setEnabled(True)
-        self.open_button.setEnabled(True)
         self.video_slider.setMaximum(len(self.video.frames) - 1)
         self.video_slider.setMinimum(0)
         self.video_slider.setValue(0)
-        self.apply_button.setEnabled(True)
+        self.enable_options()
         self.reset_button.setEnabled(False)
         self.update_console_message(s)
-        self.display_preview_from_playback()
+        self.thread_update_preview()
 
     def on_export_finished(self, s):
         self.update_console_message(s)
@@ -385,22 +434,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         to_qt = QtGui.QImage(image, image.shape[1], image.shape[0], image.strides[0], QtGui.QImage.Format_RGB888)
         pic = to_qt.scaled(self.width, self.height, QtCore.Qt.KeepAspectRatio)
         return pic
-
-    def on_reset_clicked(self):
-        self.reset_filters()
-        self.thread_load_video()
-
-    def reset_filters(self):
-        self.hue_spinBox.setValue(0)
-        self.saturation_spinBox.setValue(100)
-        self.brightness_spinBox.setValue(100)
-        self.max_points_spinBox.setValue(2000)
-        self.triangulation_check_box.setChecked(False)
-        self.threshold_radioButton.setChecked(True)
-        self.poisson_disk_radioButton.setChecked(False)
-        self.scale_factor_comboBox.setCurrentIndex(1)
-        self.draw_line_checkBox.setChecked(False)
-        self.thickness_spinBox.setValue(1)
 
 
 def main():
