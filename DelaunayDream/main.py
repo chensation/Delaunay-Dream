@@ -278,25 +278,27 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.set_curr_frame(self.video.frames[index])
 
     def on_play_clicked(self):
-        self.play = not self.play
-        self.playback_thread.play = self.play
-        if self.play:
-            self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPause))
-            self.playback_thread.start()
-        else:
-            self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
-            self.display_preview_from_playback()
+        if self.have_file:
+            self.play = not self.play
+            self.playback_thread.play = self.play
+            if self.play:
+                self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPause))
+                self.playback_thread.start()
+            else:
+                self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+                self.display_preview_from_playback()
 
     def on_stop(self):
-        self.play = False
-        self.playback_thread.play = False
+        if self.have_file:
+            self.play = False
+            self.playback_thread.play = False
 
-        self.playback_thread.curr_frame_idx = 0
-        self.playback_thread.curr_frame = self.video.frames[0]
+            self.playback_thread.curr_frame_idx = 0
+            self.playback_thread.curr_frame = self.video.frames[0]
 
-        self.video_slider.setValue(0)
-        self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
-        self.display_preview_from_playback()
+            self.video_slider.setValue(0)
+            self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+            self.display_preview_from_playback()
 
     ### file functions ###
 
@@ -343,6 +345,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.export_button.setEnabled(False)
         self.open_button.setEnabled(False)
         self.apply_button.setEnabled(False)
+        self.video_slider.setEnabled(False)
 
     def on_applying(self, s):
         self.update_console_message(s)
@@ -380,6 +383,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
         self.set_curr_frame(self.playback_thread.curr_frame)
         self.have_file = True
+        self.video_slider.setEnabled(True)
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.video_slider.setMaximum(len(self.video.frames) - 1)
