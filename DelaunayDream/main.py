@@ -14,11 +14,28 @@ from DelaunayDream.videopipe.process import Process
 from DelaunayDream.file_dialogue import FileDialogue
 from DelaunayDream.warning_dialogue import WarningDialogue
 
+
+class GeneralWorker(QThread):
+    in_process = pyqtSignal(str)
+    finished = pyqtSignal(str)
+
+    def __init__(self):
+        QThread.__init__(self)
+        self.func = None
+        self.in_process_str = ""
+        self.finished_str = ""
+
+    def run(self):
+        self.in_process.emit(self.in_process_str)
+        self.func()
+        self.finished.emit(self.finished_str)
+
+
 """ Thread for video player
 """
 
 
-class video_worker(QThread):
+class VideoWorker(QThread):
     play_in_process = pyqtSignal(str)
     update_slider_index = pyqtSignal(int)
     update_curr_frame = pyqtSignal(np.ndarray)
@@ -49,84 +66,19 @@ class video_worker(QThread):
         self.play_video(self.curr_frame_idx)
 
 
-""" Thread for file loading
-"""
-
-
-class load_worker(QThread):
-    load_in_process = pyqtSignal(str)
-    load_finished = pyqtSignal(Video, str)
-
-    def __init__(self, video):
-        QThread.__init__(self)
-        self.video = video
-
-    def run(self):
-        self.load_in_process.emit(f"Loading frames from {os.path.basename(self.video.filename)}...")
-        self.video.load_frames()
-        self.load_finished.emit(self.video, f"All frames from {os.path.basename(self.video.filename)} loaded and ready")
-
-
-""" Thread for apply all changes
-"""
-
-
-class apply_worker(QThread):
-    apply_in_process = pyqtSignal(str)
-    apply_finished = pyqtSignal(str, Video, Process)
-
-    def __init__(self, v, proc, tri):
-        QThread.__init__(self)
-        self.video = v
-        self.process = proc
-        self.triangulation = tri
-
-    def process_video(self):
-        self.video.process_video(self.process.apply_filters)
-        if self.process.triangulate:
-            self.video.process_video(self.triangulation.apply_triangulation)
-
-    def run(self):
-        self.apply_in_process.emit("Applying changes to all frames, please wait...")
-        self.process_video()
-        self.apply_finished.emit("All frames processed", self.video, self.process)
-
-
-""" Thread for writing
-"""
-
-
-class export_worker(QThread):
-    export_in_process = pyqtSignal(str)
-    export_finished = pyqtSignal(str)
-
-    def __init__(self, vid, filename, ex):
-        QThread.__init__(self)
-        self.video = vid
-        self.filename = filename
-        self.extension = ex
-
-    def export_video(self):
-        self.video.export_video(self.filename + self.extension)
-
-    def run(self):
-        self.export_in_process.emit(f"Writing to {os.path.basename(self.filename + self.extension)}...")
-        self.export_video()
-        self.export_finished.emit("Write finished, go take a look")
-
-
 class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         self.process = Process(triangulate=self.triangulation_check_box.isChecked())
         self.triangulation = Triangulation(image_scale=10 / 100)
+        self.worker = GeneralWorker()
         self.have_file = False
         self.applied_changes = False
 
         # video setup
         self.video = Video()
-        self.playback_thread = video_worker(self.video)
+        self.playback_thread = VideoWorker(self.video)
         self.playback_thread.update_slider_index.connect(self.update_video_slider)
         self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
         self.play = False
@@ -147,8 +99,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.mode_toggle._handle_checked_brush.setColor(QtGui.QColor('#b4b4b4'))
         self.mode_toggle._pulse_unchecked_animation = QtGui.QBrush(QtGui.QColor('#444AB9AF'))
         self.mode_toggle._pulse_checked_animation = QtGui.QBrush(QtGui.QColor('#44EBCAB5'))
-        self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
-        self.stop_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaStop))
+        self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+        self.stop_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaStop))
         self.width = self.height = 0
 
         self.mode_toggle.toggled['bool'].connect(self.dark_light_mode)
@@ -282,10 +234,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.play = not self.play
             self.playback_thread.play = self.play
             if self.play:
-                self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPause))
+                self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPause))
                 self.playback_thread.start()
             else:
-                self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+                self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
                 self.display_preview_from_playback()
 
     def on_stop(self):
@@ -297,7 +249,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.playback_thread.curr_frame = self.video.frames[0]
 
             self.video_slider.setValue(0)
-            self.play_button.setIcon(self.play_button.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+            self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
             self.display_preview_from_playback()
 
     ### file functions ###
@@ -305,12 +257,18 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def open_dialog(self):
         self.file_dialogue.exec_()
 
-    # TODO: don't create a new object every time these functions are called
+    def process_video(self):
+        self.video.process_video(self.process.apply_filters)
+        if self.process.triangulate:
+            self.video.process_video(self.triangulation.apply_triangulation)
+
     def thread_load_video(self):
         try:
-            self.worker = load_worker(self.video)
-            self.worker.load_in_process.connect(self.on_loading)
-            self.worker.load_finished.connect(self.on_load_finished)
+            self.worker.in_process.connect(self.on_loading)
+            self.worker.finished.connect(self.on_load_finished)
+            self.worker.func = self.video.load_frames
+            self.worker.in_process_str = f"Loading frames from {os.path.basename(self.video.filename)}..."
+            self.worker.finished_str = f"All frames from {os.path.basename(self.video.filename)} loaded and ready"
             self.worker.start()
 
         except Exception:
@@ -319,26 +277,34 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.open_button.setEnabled(True)
 
     def thread_process_video(self):
-        self.apply_worker = apply_worker(self.video, self.process, self.triangulation)
-        self.apply_worker.apply_in_process.connect(self.on_applying)
-        self.apply_worker.apply_finished.connect(self.on_apply_finished)
-        self.apply_worker.start()
+        self.worker.in_process.connect(self.on_applying)
+        self.worker.finished.connect(self.on_apply_finished)
+        self.worker.func = self.process_video
+        self.worker.in_process_str = "Applying changes to all frames, please wait..."
+        self.worker.finished_str = "All frames processed"
+        self.worker.start()
 
     def thread_export_video(self):
         if not self.applied_changes:
             message = "The \"Apply To All Frames\" button has not been clicked.\nNo options have been applied."
             self.warning_dialogue.warning_message.setText(message)
             self.warning_dialogue.exec_()
+
         file_filter = '.avi;; .wmv;; .mkv;; .mp4'
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
         if output_filename is None or output_filename == "":
             self.update_console_message("")
             return
 
-        self.export_worker = export_worker(self.video, output_filename, extension)
-        self.export_worker.export_in_process.connect(self.on_exporting)
-        self.export_worker.export_finished.connect(self.on_export_finished)
-        self.export_worker.start()
+        def export():
+            self.video.export_video(output_filename + extension)
+
+        self.worker.in_process.connect(self.on_exporting)
+        self.worker.finished.connect(self.on_export_finished)
+        self.worker.func = export
+        self.worker.in_process_str = f"Writing to {os.path.basename(output_filename + extension)}..."
+        self.worker.finished_str = "Write finished, go take a look"
+        self.worker.start()
 
     def on_loading(self, s):
         self.update_console_message(s)
@@ -352,6 +318,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.setEnabled(False)
         self.open_button.setEnabled(False)
         self.export_button.setEnabled(False)
+        self.video_slider.setEnabled(False)
+        self.play_button.setEnabled(False)
+        self.stop_button.setEnabled(False)
 
     def on_exporting(self, s):
         self.update_console_message(s)
@@ -359,21 +328,20 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.export_button.setEnabled(False)
         self.apply_button.setEnabled(False)
 
-    def on_apply_finished(self, s, vid, proc):
+    def on_apply_finished(self, s):
         self.update_console_message(s)
-        self.video = vid
-        self.playback_thread.video = vid
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
         self.set_curr_frame(self.playback_thread.curr_frame)
-        self.process = proc
         self.apply_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.export_button.setEnabled(True)
         self.reset_button.setEnabled(True)
+        self.video_slider.setEnabled(True)
+        self.play_button.setEnabled(True)
+        self.stop_button.setEnabled(True)
         self.reset_filters()
 
-    def on_load_finished(self, v, s):
-        self.video = v
+    def on_load_finished(self, s):
         if len(self.video.frames) == 0:
             self.update_console_message("No file loaded")
             return
@@ -381,7 +349,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.playback_thread.video = self.video
         self.playback_thread.curr_frame_idx = 0
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
-        self.set_curr_frame(self.playback_thread.curr_frame)
         self.have_file = True
         self.video_slider.setEnabled(True)
         self.export_button.setEnabled(True)
@@ -392,6 +359,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.setEnabled(True)
         self.reset_button.setEnabled(False)
         self.update_console_message(s)
+        self.display_preview_from_playback()
 
     def on_export_finished(self, s):
         self.update_console_message(s)
