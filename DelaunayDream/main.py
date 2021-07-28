@@ -92,7 +92,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation = Triangulation(image_scale=10 / 100)
         self.worker = GeneralWorker()
         self.have_file = False
-        self.applied_changes = False
+        self.applied_changes = True
 
         # video setup
         self.video = Video()
@@ -143,7 +143,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.clicked.connect(self.thread_process_video)
         self.reset_button.clicked.connect(self.on_reset_clicked)
         self.open_button.clicked.connect(self.open_dialog)
-        self.export_button.clicked.connect(self.process_video_export)
+        self.export_button.clicked.connect(self.thread_export_video)
 
     # setter functions
 
@@ -184,7 +184,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.warning_dialogue.exec_()
         
         # If Cancel is clicked, warning_dialogue.cancel_changes is set to False thus resetting radio button and warning_dialogue.cancel_changes
-        if self.warning_dialogue.cancel_changes == True:
+        if self.warning_dialogue.cancel_changes:
             self.triangulation.pds = method
         else:
             self.threshold_radioButton.setChecked(True)
@@ -200,10 +200,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
                                                           f"Are you sure you want the image scale to be {scale}?")
             self.warning_dialogue.exec_()
 
-        if self.warning_dialogue.cancel_changes == True:
-            self.triangulation.image_scale = int(scale[:-1])
+        if self.warning_dialogue.cancel_changes:
+            self.triangulation.image_scale = scale_num
         else:
-            self.scale_factor_comboBox.setCurrentIndex(2)
+            self.scale_factor_comboBox.setCurrentText(f'{self.triangulation.image_scale}%')
             self.warning_dialogue.cancel_changes = True
 
     @_update_func
@@ -320,6 +320,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.thread_update_preview()
 
     def thread_update_preview(self):
+        self.applied_changes = False
         reconnect(self.worker.in_process, self.on_preview_updating)
         reconnect(self.worker.finished, None)
 
@@ -355,55 +356,54 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.open_button.setEnabled(True)
 
     def thread_process_video(self):
-        self.applied_changes = True
         reconnect(self.worker.in_process, self.disable_options)
-        reconnect(self.worker.finished, self.on_apply_finished)
+        reconnect(self.worker.finished, self.on_process_finished)
         self.worker.func = self.process_video
         self.worker.in_process_str = "Applying changes to all frames, please wait..."
         self.worker.finished_str = "All frames processed"
         self.worker.start()
 
-    def process_video_export(self):
-        if self.applied_changes == False:
-            self.warning_dialogue.warning_message.setText("The \"Apply To All Frames\" button has not been clicked.\n"
-                                                            "No options have been appplied\n\n"
+    def thread_export_video(self):
+        if not self.applied_changes:
+            self.warning_dialogue.warning_message.setText("The currently previewed changes have not been\n"
+                                                          "applied to the actual video.\n\n"
                                                             "Are you sure you would like to proceed?")
             self.warning_dialogue.exec_()  
 
-        if self.warning_dialogue.cancel_changes == True:
-            self.thread_export_video()
-        else:
+        if not self.warning_dialogue.cancel_changes:
             self.warning_dialogue.cancel_changes = True
-
-    def thread_export_video(self):
-        file_filter = '.avi;; .wmv;; .mkv;; .mp4'
-        output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
-        if output_filename is None or output_filename == "":
-            self.update_console_message("")
             return
+        else:
+            file_filter = '.avi;; .wmv;; .mkv;; .mp4'
+            output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
+            if output_filename is None or output_filename == "":
+                self.update_console_message("")
+                return
 
-        def export():
-            self.video.export_video(output_filename + extension)
+            def export():
+                self.video.export_video(output_filename + extension)
 
-        reconnect(self.worker.in_process, self.on_exporting)
-        reconnect(self.worker.finished, self.on_export_finished)
-        self.worker.func = export
-        self.worker.in_process_str = f"Writing to {os.path.basename(output_filename + extension)}..."
-        self.worker.finished_str = "Write finished, go take a look"
-        self.worker.start()
+            reconnect(self.worker.in_process, self.on_exporting)
+            reconnect(self.worker.finished, self.on_export_finished)
+            self.worker.func = export
+            self.worker.in_process_str = f"Writing to {os.path.basename(output_filename + extension)}..."
+            self.worker.finished_str = "Write finished, go take a look"
+            self.worker.start()
 
     def on_exporting(self, s):
         self.update_console_message(s)
         self.open_button.setEnabled(False)
         self.export_button.setEnabled(False)
         self.apply_button.setEnabled(False)
+        self.reset_button.setEnabled(False)
 
-    def on_apply_finished(self, s):
+    def on_process_finished(self, s):
         self.update_console_message(s)
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
         self.set_curr_frame(self.playback_thread.curr_frame)
         self.enable_options()
         self.reset_filters()
+        self.applied_changes = True
 
     def on_load_finished(self, s):
         if len(self.video.frames) == 0:
@@ -418,6 +418,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
             return
 
+        self.applied_changes = True
         self.playback_thread.video = self.video
         self.playback_thread.curr_frame_idx = 0
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
@@ -428,13 +429,14 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.enable_options()
         self.reset_button.setEnabled(False)
         self.update_console_message(s)
-        self.thread_update_preview()
+        self.display_preview_from_playback()
 
     def on_export_finished(self, s):
         self.update_console_message(s)
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.apply_button.setEnabled(True)
+        self.reset_button.setEnabled(True)
 
     ### helper functions ###
     def update_console_message(self, message):
