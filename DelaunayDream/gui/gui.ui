@@ -1006,7 +1006,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="Toggle" name="triangulation_check_box">
            <property name="enabled">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="minimumSize">
             <size>
@@ -1070,7 +1070,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="enabled">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="minimumSize">
           <size>
