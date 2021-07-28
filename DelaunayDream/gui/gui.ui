@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1257</width>
-    <height>651</height>
+    <width>1260</width>
+    <height>679</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -74,6 +74,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="export_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -158,6 +161,9 @@
         </item>
         <item>
          <widget class="QSlider" name="video_slider">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>854</width>
@@ -198,6 +204,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="play_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>40</width>
@@ -245,6 +254,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="stop_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>40</width>
@@ -355,6 +367,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout_14">
       <item>
        <widget class="QPushButton" name="apply_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -485,7 +500,10 @@ p, li { white-space: pre-wrap; }
      </widget>
     </item>
     <item row="0" column="3" rowspan="2">
-     <widget class="QGroupBox" name="groupBox_2">
+     <widget class="QGroupBox" name="all_options">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="minimumSize">
        <size>
         <width>300</width>
@@ -1381,16 +1399,11 @@ p, li { white-space: pre-wrap; }
                 <string>10%</string>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>1</number>
                </property>
                <item>
                 <property name="text">
-                 <string>100%</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>50%</string>
+                 <string>5%</string>
                 </property>
                </item>
                <item>
@@ -1400,7 +1413,17 @@ p, li { white-space: pre-wrap; }
                </item>
                <item>
                 <property name="text">
-                 <string>1%</string>
+                 <string>20%</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>50%</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>100%</string>
                 </property>
                </item>
               </widget>
@@ -1713,11 +1736,11 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1206</x>
+     <x>1205</x>
      <y>76</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1163</x>
+     <x>1162</x>
      <y>76</y>
     </hint>
    </hints>
@@ -1729,11 +1752,11 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1163</x>
+     <x>1162</x>
      <y>76</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1206</x>
+     <x>1205</x>
      <y>76</y>
     </hint>
    </hints>
@@ -1745,11 +1768,11 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1163</x>
+     <x>1162</x>
      <y>150</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1206</x>
+     <x>1205</x>
      <y>150</y>
     </hint>
    </hints>
@@ -1761,11 +1784,11 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1206</x>
+     <x>1205</x>
      <y>150</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1163</x>
+     <x>1162</x>
      <y>150</y>
     </hint>
    </hints>
@@ -1777,11 +1800,11 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1206</x>
+     <x>1205</x>
      <y>224</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1163</x>
+     <x>1162</x>
      <y>224</y>
     </hint>
    </hints>
@@ -1793,11 +1816,11 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1163</x>
+     <x>1162</x>
      <y>224</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1206</x>
+     <x>1205</x>
      <y>224</y>
     </hint>
    </hints>
@@ -1809,12 +1832,12 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1192</x>
-     <y>546</y>
+     <x>1191</x>
+     <y>547</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1154</x>
-     <y>546</y>
+     <x>1153</x>
+     <y>547</y>
     </hint>
    </hints>
   </connection>
@@ -1825,12 +1848,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>966</x>
-     <y>504</y>
+     <x>965</x>
+     <y>505</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1154</x>
-     <y>546</y>
+     <x>1153</x>
+     <y>547</y>
     </hint>
    </hints>
   </connection>
@@ -1841,12 +1864,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>966</x>
-     <y>504</y>
+     <x>965</x>
+     <y>505</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1192</x>
-     <y>546</y>
+     <x>1191</x>
+     <y>547</y>
     </hint>
    </hints>
   </connection>
@@ -1857,12 +1880,12 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1154</x>
-     <y>546</y>
+     <x>1153</x>
+     <y>547</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1192</x>
-     <y>546</y>
+     <x>1191</x>
+     <y>547</y>
     </hint>
    </hints>
   </connection>
@@ -1873,11 +1896,11 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1211</x>
+     <x>1210</x>
      <y>289</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1202</x>
+     <x>1201</x>
      <y>555</y>
     </hint>
    </hints>
