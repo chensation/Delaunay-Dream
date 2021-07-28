@@ -175,7 +175,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.open_button.clicked.connect(self.open_dialog)
         self.export_button.setEnabled(False)
         self.apply_button.setEnabled(False)
-        self.export_button.clicked.connect(self.thread_export_video)
+        self.export_button.clicked.connect(self.process_video_export)
 
     # setter functions
 
@@ -209,22 +209,34 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     @_update_func
     def set_sampling_method(self, method):
+        # Open Warning Dialogue if Poisson Disk is selected
         if method:
             self.warning_dialogue.warning_message.setText(
                 "Poisson Disk significant slows down processing but results to \nbetter output")
             self.warning_dialogue.exec_()
-        self.triangulation.pds = method
+        
+        # If Cancel is clicked, warning_dialogue.cancel_changes is set to False thus resetting radio button and warning_dialogue.cancel_changes
+        if self.warning_dialogue.cancel_changes == True:
+            self.triangulation.pds = method
+        else:
+            self.threshold_radioButton.setChecked(True)
+            self.warning_dialogue.cancel_changes = True
+
 
     @_update_func
     def set_image_scale(self, scale):
         scale_num = int(scale[:-1])
         if scale_num >= 50:
-            self.warning_dialogue.warning_message.setText("Although a higher image scale allows more accurate colors, "
-                                                          "it cause the triangulation to be much slower\n"
+            self.warning_dialogue.warning_message.setText("Although a higher image scale allows more accurate colors, \n"
+                                                          "it causes the triangulation to be much slower\n\n"
                                                           f"Are you sure you want the image scale to be {scale}?")
             self.warning_dialogue.exec_()
 
-        self.triangulation.image_scale = int(scale[:-1])
+        if self.warning_dialogue.cancel_changes == True:
+            self.triangulation.image_scale = int(scale[:-1])
+        else:
+            self.scale_factor_comboBox.setCurrentIndex(2)
+            self.warning_dialogue.cancel_changes = True
 
     @_update_func
     def set_line(self, line):
@@ -319,16 +331,25 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.open_button.setEnabled(True)
 
     def thread_process_video(self):
+        self.applied_changes = True
         self.apply_worker = apply_worker(self.video, self.process, self.triangulation)
         self.apply_worker.apply_in_process.connect(self.on_applying)
         self.apply_worker.apply_finished.connect(self.on_apply_finished)
         self.apply_worker.start()
 
+    def process_video_export(self):
+        if self.applied_changes == False:
+            self.warning_dialogue.warning_message.setText("The \"Apply To All Frames\" button has not been clicked.\n"
+                                                            "No options have been appplied\n\n"
+                                                            "Are you sure you would like to proceed?")
+            self.warning_dialogue.exec_()  
+
+        if self.warning_dialogue.cancel_changes == True:
+            self.thread_export_video()
+        else:
+            self.warning_dialogue.cancel_changes = True
+
     def thread_export_video(self):
-        if not self.applied_changes:
-            message = "The \"Apply To All Frames\" button has not been clicked.\nNo options have been applied."
-            self.warning_dialogue.warning_message.setText(message)
-            self.warning_dialogue.exec_()
         file_filter = '.avi;; .wmv;; .mkv;; .mp4'
         output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
         if output_filename is None or output_filename == "":
@@ -400,7 +421,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.apply_button.setEnabled(True)
 
     ### helper functions ###
-
     def update_console_message(self, message):
         self.status_message.setText(message)
 
@@ -430,7 +450,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation_check_box.setChecked(False)
         self.threshold_radioButton.setChecked(True)
         self.poisson_disk_radioButton.setChecked(False)
-        self.scale_factor_comboBox.setCurrentIndex(1)
+        self.scale_factor_comboBox.setCurrentIndex(2)
         self.draw_line_checkBox.setChecked(False)
         self.thickness_spinBox.setValue(1)
 

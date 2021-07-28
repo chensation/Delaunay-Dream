@@ -19,7 +19,7 @@ class FileDialogue(Ui_Dialog, QtWidgets.QDialog):
 
     def set_filename(self):
         self.warning_msg.setText('')
-        self._filename = QtWidgets.QFileDialog.getOpenFileName(filter="Video files(*.*)")[0]
+        self._filename = QtWidgets.QFileDialog.getOpenFileName(self.browse_button, filter="Video files(*.*)")[0]
         self.file_lineEdit.setText(self._filename)
         self.confirm_file()
 
