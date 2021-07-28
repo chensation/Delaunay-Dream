@@ -182,7 +182,9 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # Open Warning Dialogue if Poisson Disk is selected
         if method:
             self.warning_dialogue.warning_message.setText(
-                "Poisson Disk significant slows down processing but results to \nbetter output")
+                "Although Poisson Disk Sampling results in better output, \n"
+                "it significantly slows down the triangulation\n\n"
+                "Are you sure you want to select this option?")
             self.warning_dialogue.exec_()
         
         # If Cancel is clicked, warning_dialogue.cancel_changes is set to False thus resetting radio button and warning_dialogue.cancel_changes

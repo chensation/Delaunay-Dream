@@ -204,7 +204,7 @@
           <string>Confirm</string>
          </property>
          <property name="text">
-          <string>OK</string>
+          <string>Yes</string>
          </property>
         </widget>
        </item>

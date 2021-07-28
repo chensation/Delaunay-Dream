@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'gui/warning.ui'
+# Form implementation generated from reading ui file 'DelaunayDream/gui/warning.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -100,7 +100,7 @@ class Ui_Dialog_Warning(object):
         self.warning_message.setText(_translate("Dialog_Warning", "[Message Goes Here]"))
         self.ok_warning_button.setToolTip(_translate("Dialog_Warning", "Confirm"))
         self.ok_warning_button.setStatusTip(_translate("Dialog_Warning", "Confirm"))
-        self.ok_warning_button.setText(_translate("Dialog_Warning", "OK"))
+        self.ok_warning_button.setText(_translate("Dialog_Warning", "Yes"))
         self.cancel_warning_button.setToolTip(_translate("Dialog_Warning", "Cancel"))
         self.cancel_warning_button.setStatusTip(_translate("Dialog_Warning", "Cancel"))
         self.cancel_warning_button.setText(_translate("Dialog_Warning", "Cancel"))
