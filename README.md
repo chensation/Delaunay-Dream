@@ -1,5 +1,6 @@
-# Delaunay-Dream
- 
+# Delaunay-Dream  
+<img src=https://user-images.githubusercontent.com/32966177/127242583-4c12184d-95ae-48e8-9a71-6b5f19fad545.png width="100" height="100" />  
+
 ## Description
 This Application allows the user to apply Delaunay triangulation to videos as a visual effect. It also allows for other visual effects such as changing the hue, saturation, and brightness of the video. All of these tools are presented in a simple and intuitive gui.
  
