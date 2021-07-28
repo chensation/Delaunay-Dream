@@ -145,6 +145,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.open_button.clicked.connect(self.open_dialog)
         self.export_button.clicked.connect(self.thread_export_video)
 
+        self.all_options.setEnabled(False)
+        
     # setter functions
 
     def _update_func(func, *args, **kwargs):
@@ -203,7 +205,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         if self.warning_dialogue.cancel_changes:
             self.triangulation.image_scale = scale_num
         else:
-            self.scale_factor_comboBox.setCurrentText(f'{self.triangulation.image_scale}%')
+            self.scale_factor_comboBox.setCurrentText(f'{int(self.triangulation.image_scale)}%')
             self.warning_dialogue.cancel_changes = True
 
     @_update_func

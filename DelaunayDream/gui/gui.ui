@@ -502,7 +502,7 @@ p, li { white-space: pre-wrap; }
     <item row="0" column="3" rowspan="2">
      <widget class="QGroupBox" name="all_options">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="minimumSize">
        <size>
@@ -1024,7 +1024,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="Toggle" name="triangulation_check_box">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="minimumSize">
             <size>
@@ -1088,7 +1088,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="minimumSize">
           <size>
@@ -1273,10 +1273,10 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="toolTip">
-                <string>Threshold Sampling Method</string>
+                <string>Threshold Sampling Method (quick, but with mediocre results)</string>
                </property>
                <property name="statusTip">
-                <string>Threshold Sampling Method</string>
+                <string>Threshold Sampling Method (quick, but with mediocre results)</string>
                </property>
                <property name="text">
                 <string>Threshold</string>
@@ -1295,10 +1295,10 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="toolTip">
-                <string>Poisson Disk Sampling Method</string>
+                <string>Poisson Disk Sampling Method (slow, but with great results)</string>
                </property>
                <property name="statusTip">
-                <string>Poisson Disk Sampling Method</string>
+                <string>Poisson Disk Sampling Method (slow, but with great results)</string>
                </property>
                <property name="text">
                 <string>Poisson Disk</string>
@@ -1387,10 +1387,10 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="toolTip">
-                <string>Scale Factor Selection</string>
+                <string>Scale Factor determines how accurate the colors of the triangulated images are (higher is slower)</string>
                </property>
                <property name="statusTip">
-                <string>Scale Factor Selection</string>
+                <string>Scale Factor determines how accurate the colors of the triangulated images are (higher is slower)</string>
                </property>
                <property name="inputMethodHints">
                 <set>Qt::ImhNone</set>
