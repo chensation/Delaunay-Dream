@@ -377,7 +377,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.warning_dialogue.cancel_changes = True
             return
         else:
-            file_filter = '.avi;; .wmv;; .mkv;; .mp4'
+            file_filter = '.avi;; .mov;; .mkv;; .mp4'
             output_filename, extension = QtWidgets.QFileDialog.getSaveFileName(filter=file_filter)
             if output_filename is None or output_filename == "":
                 self.update_console_message("")

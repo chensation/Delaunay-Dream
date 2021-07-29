@@ -97,19 +97,10 @@ class Video:
             writer.write(frame)
         writer.release()
         
-        ext = filename[-3:]
-
         clip = VideoFileClip(filename= filename)
         clip = clip.set_audio(self._audio)
        
-        codecs = {
-            "avi":'libx264',
-            "wmv":'wmv2',
-            "mkv":'libx264',
-            "mp4":'libx264'
-        }
-
-        clip.write_videofile(filename,fps = self._fps, codec = codecs[ext])
+        clip.write_videofile(filename,fps = self._fps, codec = 'libx264')
         del clip
 
 
