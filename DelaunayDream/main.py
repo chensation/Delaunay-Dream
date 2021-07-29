@@ -141,7 +141,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         # file options
         self.apply_button.clicked.connect(self.thread_process_video)
-        self.reset_button.clicked.connect(self.on_reset_clicked)
+        self.reset_button.clicked.connect(self.thread_load_video)
         self.open_button.clicked.connect(self.open_dialog)
         self.export_button.clicked.connect(self.thread_export_video)
 
@@ -226,10 +226,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
                 self.thread_update_preview()
 
     ### filter functions ###
-
-    def on_reset_clicked(self):
-        self.reset_filters()
-        self.thread_load_video()
 
     def reset_filters(self):
         self.hue_spinBox.setValue(0)
@@ -436,6 +432,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.enable_options()
         self.reset_button.setEnabled(False)
         self.update_console_message(s)
+        
+        self.reset_filters()
         self.display_preview_from_playback()
 
     def on_export_finished(self, s):
