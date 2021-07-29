@@ -94,9 +94,8 @@ class Video:
 
         ext = filename[-3:]
         rgbframes = self.frames.copy()
-        if(not ext == "avi"):
-            rgbframes[:,:,:,0] = self.frames[:,:,:,2]
-            rgbframes[:,:,:,2] = self.frames[:,:,:,0]
+        rgbframes[:,:,:,0] = self.frames[:,:,:,2]
+        rgbframes[:,:,:,2] = self.frames[:,:,:,0]
         clip = ImageSequenceClip(list(rgbframes), fps = self._fps)
         clip = clip.set_audio(self._audio)
 
