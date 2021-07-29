@@ -92,16 +92,20 @@ class Video:
 
     def export_video(self, filename, have_color=True):
 
-        writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
+        tempfile = str(uuid.uuid4())+'.avi'
+
+        writer = cv.VideoWriter(tempfile, self._fourcc, self._fps, self._video_size, have_color)
         for frame in self._frames:
             writer.write(frame)
         writer.release()
-        
-        clip = VideoFileClip(filename= filename)
+
+        clip = VideoFileClip(filename= tempfile)
         clip = clip.set_audio(self._audio)
        
-        clip.write_videofile(filename,fps = self._fps, codec = 'libx264')
+        clip.write_videofile(filename, codec = 'libx264')
         del clip
+        if os.path.exists(tempfile):
+            os.remove(tempfile)
 
 
     def process_video(self, func):
