@@ -153,6 +153,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         def inner(self, *args, **kwargs):
             func(self, *args, *kwargs)
             if self.have_file and not self.play:
+                self.applied_changes = False
                 self.thread_update_preview()
 
         return inner
@@ -218,10 +219,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def set_line_thickness(self, thickness):
         self.triangulation.line_thickness = thickness
 
-    @_update_func
     def resizeEvent(self, event):
         self.width = self.video_player.width()
         self.height = self.video_player.height()
+        if self.have_file and not self.play:
+                self.thread_update_preview()
 
     ### filter functions ###
 
@@ -324,7 +326,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.thread_update_preview()
 
     def thread_update_preview(self):
-        self.applied_changes = False
         reconnect(self.worker.in_process, self.on_preview_updating)
         reconnect(self.worker.finished, None)
 
@@ -360,6 +361,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.open_button.setEnabled(True)
 
     def thread_process_video(self):
+        if self.play:
+            self.on_play_clicked()
         reconnect(self.worker.in_process, self.disable_options)
         reconnect(self.worker.finished, self.on_process_finished)
         self.worker.func = self.process_video
