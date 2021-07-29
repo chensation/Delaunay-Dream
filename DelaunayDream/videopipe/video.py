@@ -109,6 +109,8 @@ class Video:
         }
 
         clip.write_videofile(filename,fps = self._fps, codec = codecs[ext])
+        del rgbframes
+        del(clip)
 
         # writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
         # for frame in self._frames:
