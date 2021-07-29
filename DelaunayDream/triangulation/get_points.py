@@ -99,7 +99,8 @@ def poisson_sample(n, weights):
     eligiblePoints = np.ndarray(shape = (1, 2))
     eligiblePoints[0, :] = points
     unavailable = np.zeros_like(weights, dtype = bool)
-    unavailable[points[0, :].astype(int)] = True
+    firstPoint = points[0, :].astype(int)
+    unavailable[firstPoint[0], firstPoint[1]] = True
 
     while numPoints < n and eligiblePoints.shape[0] > 0:
         sourcePointRow = randrange(0, eligiblePoints.shape[0])
