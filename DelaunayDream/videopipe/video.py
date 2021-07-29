@@ -5,6 +5,7 @@ import multiprocessing as mp
 import numpy as np
 from moviepy.editor import *
 import uuid
+import os
 
 
 class Video:
