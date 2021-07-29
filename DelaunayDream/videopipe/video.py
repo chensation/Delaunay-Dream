@@ -4,6 +4,7 @@ from multiprocessing import shared_memory
 import multiprocessing as mp
 import numpy as np
 from moviepy.editor import *
+import uuid
 
 
 class Video:
