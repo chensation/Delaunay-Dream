@@ -153,6 +153,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         def inner(self, *args, **kwargs):
             func(self, *args, *kwargs)
             if self.have_file and not self.play:
+                self.applied_changes = False
                 self.thread_update_preview()
 
         return inner
@@ -324,7 +325,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.thread_update_preview()
 
     def thread_update_preview(self):
-        self.applied_changes = False
         reconnect(self.worker.in_process, self.on_preview_updating)
         reconnect(self.worker.finished, None)
 
