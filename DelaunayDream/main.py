@@ -168,8 +168,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def _update_func(func, *args, **kwargs):
         def inner(self, *args, **kwargs):
             func(self, *args, *kwargs)
-            if self.have_file and not self.play and self.allow_preview_update:
+            if self.allow_preview_update:
                 self.applied_changes = False
+                self.reset_button.setEnabled(True)
+            if self.have_file and not self.play and self.allow_preview_update:
                 self.thread_update_preview()
 
         return inner
@@ -349,7 +351,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.thread_update_preview()
 
     def thread_update_preview(self):
-        self.preview_worker.start()
+        if not self.applied_changes:
+            self.preview_worker.start()
 
     def on_preview_updating(self, s):
         self.video_player.setText(s)
