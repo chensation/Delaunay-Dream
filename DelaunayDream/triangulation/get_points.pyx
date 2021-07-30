@@ -91,7 +91,11 @@ def poisson_sample(n, weights):
     idealRW = round((idealRH * (width / height)))
     candidates = np.argwhere(weights > 0)
     points = np.ndarray(shape=(1, 2))
-    points[0, :] = candidates[randrange(0, candidates.shape[0]), :]
+    numCandidates = candidates.shape[0]
+    if numCandidates > 0:
+        points[0, :] = candidates[randrange(0, candidates.shape[0]), :]
+    else:
+        points[0, :] = [randrange(0, height), randrange(0, width)]
 
     # Now have initial point to start expanding from, list of candidates to choose from, and weights.
 
