@@ -93,6 +93,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.worker = GeneralWorker()
         self.have_file = False
         self.applied_changes = True
+        self.allow_preview_update = True
 
         # video setup
         self.video = Video()
@@ -166,7 +167,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def _update_func(func, *args, **kwargs):
         def inner(self, *args, **kwargs):
             func(self, *args, *kwargs)
-            if self.have_file and not self.play:
+            if self.have_file and not self.play and self.allow_preview_update:
                 self.applied_changes = False
                 self.thread_update_preview()
 
@@ -242,6 +243,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     ### filter functions ###
 
     def reset_filters(self):
+        self.allow_preview_update = False
+        
         self.hue_spinBox.setValue(0)
         self.saturation_spinBox.setValue(100)
         self.brightness_spinBox.setValue(100)
@@ -252,6 +255,14 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.scale_factor_comboBox.setCurrentIndex(1)
         self.draw_line_checkBox.setChecked(False)
         self.thickness_spinBox.setValue(1)
+
+        self.set_hue()
+        self.set_saturation()
+        self.set_brightness()
+        self.set_num_pts()
+        self.set_line_thickness()
+
+        self.allow_preview_update = True
 
     def disable_options(self, s):
         self.update_console_message(s)
@@ -415,11 +426,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def on_process_finished(self, s):
         self.update_console_message(s)
+        self.reset_filters()
+        self.enable_options()
+        self.applied_changes = True
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
         self.set_curr_frame(self.playback_thread.curr_frame)
-        self.enable_options()
-        self.reset_filters()
-        self.applied_changes = True
 
     def on_load_finished(self, s):
         if len(self.video.frames) == 0:
@@ -435,7 +446,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             return
 
         self.applied_changes = True
-        self.playback_thread.video = self.video
+        self.reset_filters()
         self.playback_thread.curr_frame_idx = 0
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
         self.have_file = True
@@ -445,7 +456,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.enable_options()
         self.reset_button.setEnabled(False)
         self.update_console_message(s)
-        self.reset_filters()
         self.display_preview_from_playback()
 
     def on_export_finished(self, s):

@@ -91,7 +91,6 @@ class Video:
         self._frames = np.asarray(temp_array)
         self._audio = AudioFileClip(self._filename)
 
-
     def export_video(self, filename, have_color=True):
 
         tempfile = str(uuid.uuid4())+'.avi'
@@ -108,7 +107,6 @@ class Video:
         del clip
         if os.path.exists(tempfile):
             os.remove(tempfile)
-
 
     def process_video(self, func):
 
