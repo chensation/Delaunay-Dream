@@ -367,6 +367,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def thread_load_video(self):
         try:
+            if self.play and self.have_file:
+                self.play = False
+                self.playback_thread.play = False
+                self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+
             reconnect(self.worker.in_process, self.disable_options)
             reconnect(self.worker.finished, self.on_load_finished)
             self.worker.func = self.video.load_frames
@@ -382,8 +387,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.open_button.setEnabled(True)
 
     def thread_process_video(self):
-        if self.play:
-            self.on_play_clicked()
+        if self.play and self.have_file:
+                self.play = False
+                self.playback_thread.play = False
+                self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+
         reconnect(self.worker.in_process, self.disable_options)
         reconnect(self.worker.finished, self.on_process_finished)
         self.worker.func = self.process_video
@@ -431,6 +439,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.enable_options()
         self.applied_changes = True
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
+        self.curr_frame = self.playback_thread.curr_frame
+        self.set_curr_frame(self.curr_frame)
 
     def on_load_finished(self, s):
         if len(self.video.frames) == 0:
