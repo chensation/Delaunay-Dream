@@ -92,29 +92,17 @@ class Video:
 
     def export_video(self, filename, have_color=True):
 
-        ext = filename[-3:]
-        rgbframes = self.frames.copy()
-        rgbframes[:,:,:,0] = self.frames[:,:,:,2]
-        rgbframes[:,:,:,2] = self.frames[:,:,:,0]
-        clip = ImageSequenceClip(list(rgbframes), fps = self._fps)
+        writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
+        for frame in self._frames:
+            writer.write(frame)
+        writer.release()
+        
+        clip = VideoFileClip(filename= filename)
         clip = clip.set_audio(self._audio)
-
        
-        codecs = {
-            "avi":'libx264',
-            "wmv":'wmv2',
-            "mkv":'libx264',
-            "mp4":'libx264'
-        }
+        clip.write_videofile(filename,fps = self._fps, codec = 'libx264')
+        del clip
 
-        clip.write_videofile(filename,fps = self._fps, codec = codecs[ext])
-        del rgbframes
-        del(clip)
-
-        # writer = cv.VideoWriter(filename, self._fourcc, self._fps, self._video_size, have_color)
-        # for frame in self._frames:
-        #     writer.write(frame)
-        # writer.release()
 
     def process_video(self, func):
 
