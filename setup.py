@@ -18,7 +18,7 @@ extensions = [
 
 setup(
     name="DelaunayDream",
-    version="1.0.0",
+    version="1.0.1",
     packages=["DelaunayDream", "DelaunayDream.gui", "DelaunayDream.triangulation", "DelaunayDream.videopipe"],
     url="https://github.com/chensation/Delaunay-Dream.git",
     author="drowning_princesses",
