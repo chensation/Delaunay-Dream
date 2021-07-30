@@ -24,3 +24,11 @@
 * (7/29) Reimplement PDS function in Cython, various bug fixes
 
 ## Jiahao Fan
+* (6/10) Research general information on openCV
+* (6/17) Create basic video processing pipeline structure
+* (6/17) Implement basic canny edge detection
+* (6/24) Implement video pipeline
+* (6/24) Connect front end GUI with video pipeline
+* (7/07) Research multithreading options for GUI
+* (7/14) Implement QThread to prevent GUI from freezing
+* (7/21) Implement video playback
