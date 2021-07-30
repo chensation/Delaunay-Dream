@@ -104,7 +104,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # preview set up
         self.preview_worker = GeneralWorker()
         self.preview_worker.in_process.connect(self.on_preview_updating)
-        self.preview_worker.finished.connect(self.on_preview_finished)
+        self.preview_worker.finished.connect(self.enable_options)
         self.preview_worker.func = self.display_preview_from_playback
         self.preview_worker.in_process_str = "PROCESSING PREVIEW..."
 
@@ -341,16 +341,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def on_preview_updating(self, s):
         self.video_player.setText(s)
-        self.video_slider.setEnabled(False)
-        self.play_button.setEnabled(False)
-        self.stop_button.setEnabled(False)
-        self.all_options.setEnabled(False)
-
-    def on_preview_finished(self, s):
-        self.video_slider.setEnabled(True)
-        self.play_button.setEnabled(True)
-        self.stop_button.setEnabled(True)
-        self.all_options.setEnabled(True)
+        self.disable_options('');
 
     ### file functions ###
 
