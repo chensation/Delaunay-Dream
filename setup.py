@@ -9,6 +9,11 @@ extensions = [
         ["DelaunayDream/triangulation/triangulate.pyx"],
         include_dirs=[np.get_include()],
     ),
+    Extension(
+        "DelaunayDream.triangulation.get_points",
+        ["DelaunayDream/triangulation/get_points.pyx"],
+        include_dirs=[np.get_include()],
+    ),
 ]
 
 setup(
