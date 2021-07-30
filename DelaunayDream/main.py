@@ -94,6 +94,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.have_file = False
         self.applied_changes = True
         self.allow_preview_update = True
+        self.curr_frame = None
 
         # video setup
         self.video = Video()
@@ -237,8 +238,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def resizeEvent(self, event):
         self.width = self.video_player.width()
         self.height = self.video_player.height()
-        if self.have_file and not self.play:
-                self.thread_update_preview()
+        if self.have_file and not self.play and self.allow_preview_update and self.video_player.pixmap() != None:
+            self.set_curr_frame(self.curr_frame)
 
     ### filter functions ###
 
@@ -430,7 +431,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.enable_options()
         self.applied_changes = True
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
-        self.set_curr_frame(self.playback_thread.curr_frame)
 
     def on_load_finished(self, s):
         if len(self.video.frames) == 0:
@@ -475,6 +475,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         if self.process.triangulate:
             image = self.triangulation.apply_triangulation(image)
 
+        self.curr_frame = image
         self.set_curr_frame(image)
 
     def frame_to_qt(self, frame):
