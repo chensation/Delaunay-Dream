@@ -102,6 +102,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.play = False
 
         # Video Playback ui
+        self.video_slider.setPageStep(0)
         self.play_button.clicked.connect(self.on_play_clicked)
         self.video_slider.valueChanged['int'].connect(self.update_thread_index)
         self.video_slider.sliderPressed.connect(self.on_slider_pressed)
@@ -284,6 +285,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.video_slider.setValue(index)
 
     def on_slider_pressed(self):
+        
         self.playback_thread.play = False
 
     def on_slider_released(self):
@@ -432,7 +434,6 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.enable_options()
         self.reset_button.setEnabled(False)
         self.update_console_message(s)
-        
         self.reset_filters()
         self.display_preview_from_playback()
 
