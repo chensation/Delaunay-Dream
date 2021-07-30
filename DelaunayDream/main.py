@@ -349,6 +349,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             reconnect(self.worker.in_process, self.disable_options)
             reconnect(self.worker.finished, self.on_load_finished)
             self.worker.func = self.video.load_frames
+            self.width = self.video_player.width()
+            self.height = self.video_player.height()
             self.worker.in_process_str = f"Loading frames from {os.path.basename(self.video.filename)}..."
             self.worker.finished_str = f"All frames from {os.path.basename(self.video.filename)} loaded and ready"
             self.worker.start()
