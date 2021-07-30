@@ -136,7 +136,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # Pop-up Dialog  
         self.warning_dialogue = WarningDialogue()
         self.file_dialogue = FileDialogue(self.video)
-        self.file_dialogue.ok_button.clicked.connect(self.thread_load_video)
+        self.file_dialogue.finished.connect(self.thread_load_video)
 
         # filter options
         self.hue_spinBox.editingFinished.connect(self.set_hue)
