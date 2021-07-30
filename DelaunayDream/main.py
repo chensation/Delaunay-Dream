@@ -94,6 +94,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.have_file = False
         self.applied_changes = True
         self.allow_preview_update = True
+        self.dark_mode = True
+        self.curr_frame = None
 
         # video setup
         self.video = Video()
@@ -112,7 +114,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # Video Playback ui
         self.video_slider.setPageStep(0)
         self.play_button.clicked.connect(self.on_play_clicked)
-        self.video_slider.valueChanged['int'].connect(self.update_thread_index)
+        self.video_slider.valueChanged['int'].connect(self.update_playback_index)
         self.video_slider.sliderPressed.connect(self.on_slider_pressed)
         self.video_slider.sliderReleased.connect(self.on_slider_released)
         self.stop_button.clicked.connect(self.on_stop)
@@ -135,7 +137,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # Pop-up Dialog  
         self.warning_dialogue = WarningDialogue()
         self.file_dialogue = FileDialogue(self.video)
-        self.file_dialogue.ok_button.clicked.connect(self.thread_load_video)
+        self.file_dialogue.finished.connect(self.thread_load_video)
 
         # filter options
         self.hue_spinBox.editingFinished.connect(self.set_hue)
@@ -167,8 +169,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def _update_func(func, *args, **kwargs):
         def inner(self, *args, **kwargs):
             func(self, *args, *kwargs)
-            if self.have_file and not self.play and self.allow_preview_update:
+            if self.allow_preview_update:
                 self.applied_changes = False
+                self.reset_button.setEnabled(True)
+            if self.have_file and not self.play and self.allow_preview_update:
                 self.thread_update_preview()
 
         return inner
@@ -180,14 +184,17 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     @_update_func
     def set_hue(self):
         self.process.hue = self.hue_spinBox.value()
+        self.hue_slider.setValue(self.hue_spinBox.value())
 
     @_update_func
     def set_saturation(self):
         self.process.saturation = self.saturation_spinBox.value()
+        self.saturation_slider.setValue(self.saturation_spinBox.value())
 
     @_update_func
     def set_brightness(self):
         self.process.brightness = self.brightness_spinBox.value()
+        self.brightness_slider.setValue(self.brightness_spinBox.value())
 
     @_update_func
     def set_num_pts(self):
@@ -233,12 +240,13 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     @_update_func
     def set_line_thickness(self):
         self.triangulation.line_thickness = self.thickness_spinBox.value()
+        self.thickness_slider.setValue(self.thickness_spinBox.value())
 
     def resizeEvent(self, event):
         self.width = self.video_player.width()
         self.height = self.video_player.height()
-        if self.have_file and not self.play:
-                self.thread_update_preview()
+        if self.have_file and not self.play and self.allow_preview_update and self.video_player.pixmap() != None:
+            self.set_curr_frame(self.curr_frame)
 
     ### filter functions ###
 
@@ -265,6 +273,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.allow_preview_update = True
 
     def disable_options(self, s):
+        if self.dark_mode == True:
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#4D4D4D'))
+        else:
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#E0E0E0'))
         self.update_console_message(s)
         self.export_button.setEnabled(False)
         self.open_button.setEnabled(False)
@@ -276,6 +288,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.all_options.setEnabled(False)
 
     def enable_options(self):
+        if self.dark_mode == True:
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
+        else:
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#973680'))
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.apply_button.setEnabled(True)
@@ -289,15 +305,23 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def dark_light_mode(self, mode):
         if mode == True:
+            self.dark_mode = False
             self.setStyleSheet(StyleSheet().light_mode)
             self.file_dialogue.setStyleSheet(StyleSheet().light_mode)
             self.warning_dialogue.setStyleSheet(StyleSheet().light_mode)
-            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#973680'))
+            if self.triangulation_check_box.isEnabled() == True:
+                self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#973680'))
+            else:
+                self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#E0E0E0'))
         else:
+            self.dark_mode = True
             self.file_dialogue.setStyleSheet(StyleSheet().dark_mode)
             self.warning_dialogue.setStyleSheet(StyleSheet().dark_mode)
             self.setStyleSheet(StyleSheet().dark_mode)
-            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
+            if self.triangulation_check_box.isEnabled() == True:
+                self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
+            else:
+                self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#4D4D4D'))
 
     ### video functions ###
 
@@ -319,7 +343,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         else:
             self.thread_update_preview()
 
-    def update_thread_index(self, index):
+    def update_playback_index(self, index):
         self.playback_thread.curr_frame_idx = index
         self.playback_thread.curr_frame = self.video.frames[index]
         self.set_curr_frame(self.video.frames[index])
@@ -348,7 +372,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.thread_update_preview()
 
     def thread_update_preview(self):
-        self.preview_worker.start()
+        if not self.applied_changes:
+            self.preview_worker.start()
 
     def on_preview_updating(self, s):
         self.video_player.setText(s)
@@ -366,6 +391,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def thread_load_video(self):
         try:
+            if self.play and self.have_file:
+                self.play = False
+                self.playback_thread.play = False
+                self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+
             reconnect(self.worker.in_process, self.disable_options)
             reconnect(self.worker.finished, self.on_load_finished)
             self.worker.func = self.video.load_frames
@@ -381,8 +411,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.open_button.setEnabled(True)
 
     def thread_process_video(self):
-        if self.play:
-            self.on_play_clicked()
+        if self.play and self.have_file:
+                self.play = False
+                self.playback_thread.play = False
+                self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+
         reconnect(self.worker.in_process, self.disable_options)
         reconnect(self.worker.finished, self.on_process_finished)
         self.worker.func = self.process_video
@@ -429,8 +462,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.reset_filters()
         self.enable_options()
         self.applied_changes = True
-        self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
-        self.set_curr_frame(self.playback_thread.curr_frame)
+        self.update_playback_index(self.playback_thread.curr_frame_idx)
+        self.curr_frame = self.playback_thread.curr_frame
 
     def on_load_finished(self, s):
         if len(self.video.frames) == 0:
@@ -475,6 +508,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         if self.process.triangulate:
             image = self.triangulation.apply_triangulation(image)
 
+        self.curr_frame = image
         self.set_curr_frame(image)
 
     def frame_to_qt(self, frame):

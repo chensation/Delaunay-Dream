@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'gui.ui'
+# Form implementation generated from reading ui file 'gui/gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -69,7 +69,7 @@ class Ui_MainWindow(object):
         self.video_slider = QtWidgets.QSlider(self.centralwidget)
         self.video_slider.setEnabled(False)
         self.video_slider.setMinimumSize(QtCore.QSize(854, 20))
-        self.video_slider.setMaximumSize(QtCore.QSize(1920, 16777215))
+        self.video_slider.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.video_slider.setOrientation(QtCore.Qt.Horizontal)
         self.video_slider.setObjectName("video_slider")
         self.verticalLayout_6.addWidget(self.video_slider)
@@ -489,8 +489,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.addItem(spacerItem23)
         self.thickness_slider = QtWidgets.QSlider(self.triangulate_options)
         self.thickness_slider.setEnabled(False)
-        self.thickness_slider.setMinimumSize(QtCore.QSize(120, 20))
-        self.thickness_slider.setMaximumSize(QtCore.QSize(120, 20))
+        self.thickness_slider.setMinimumSize(QtCore.QSize(130, 20))
+        self.thickness_slider.setMaximumSize(QtCore.QSize(130, 20))
         self.thickness_slider.setMinimum(1)
         self.thickness_slider.setMaximum(5)
         self.thickness_slider.setOrientation(QtCore.Qt.Horizontal)
@@ -500,12 +500,14 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.addItem(spacerItem24)
         self.thickness_spinBox = QtWidgets.QSpinBox(self.triangulate_options)
         self.thickness_spinBox.setEnabled(False)
-        self.thickness_spinBox.setMinimumSize(QtCore.QSize(30, 20))
-        self.thickness_spinBox.setMaximumSize(QtCore.QSize(30, 20))
+        self.thickness_spinBox.setMinimumSize(QtCore.QSize(20, 20))
+        self.thickness_spinBox.setMaximumSize(QtCore.QSize(20, 20))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(9)
         self.thickness_spinBox.setFont(font)
+        self.thickness_spinBox.setAlignment(QtCore.Qt.AlignCenter)
+        self.thickness_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
         self.thickness_spinBox.setMinimum(1)
         self.thickness_spinBox.setMaximum(5)
         self.thickness_spinBox.setObjectName("thickness_spinBox")
@@ -530,13 +532,9 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.scale_factor_comboBox.setCurrentIndex(1)
-        self.hue_spinBox.valueChanged['int'].connect(self.hue_slider.setValue)
         self.hue_slider.valueChanged['int'].connect(self.hue_spinBox.setValue)
         self.saturation_slider.valueChanged['int'].connect(self.saturation_spinBox.setValue)
-        self.saturation_spinBox.valueChanged['int'].connect(self.saturation_slider.setValue)
-        self.brightness_spinBox.valueChanged['int'].connect(self.brightness_slider.setValue)
         self.brightness_slider.valueChanged['int'].connect(self.brightness_spinBox.setValue)
-        self.thickness_spinBox.valueChanged['int'].connect(self.thickness_slider.setValue)
         self.draw_line_checkBox.toggled['bool'].connect(self.thickness_slider.setEnabled)
         self.draw_line_checkBox.toggled['bool'].connect(self.thickness_spinBox.setEnabled)
         self.thickness_slider.valueChanged['int'].connect(self.thickness_spinBox.setValue)

@@ -172,7 +172,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>1920</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
@@ -1600,13 +1600,13 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>120</width>
+                 <width>130</width>
                  <height>20</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>120</width>
+                 <width>130</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1647,13 +1647,13 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>30</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>30</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1668,6 +1668,12 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="statusTip">
                 <string>Adjust Line Thickness (1 - 5)</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
                </property>
                <property name="minimum">
                 <number>1</number>
@@ -1730,22 +1736,6 @@ p, li { white-space: pre-wrap; }
  <resources/>
  <connections>
   <connection>
-   <sender>hue_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>hue_slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1205</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1162</x>
-     <y>76</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>hue_slider</sender>
    <signal>valueChanged(int)</signal>
    <receiver>hue_spinBox</receiver>
@@ -1778,38 +1768,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>saturation_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>saturation_slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1205</x>
-     <y>150</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1162</x>
-     <y>150</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>brightness_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>brightness_slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1205</x>
-     <y>224</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1162</x>
-     <y>224</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>brightness_slider</sender>
    <signal>valueChanged(int)</signal>
    <receiver>brightness_spinBox</receiver>
@@ -1826,34 +1784,18 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>thickness_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>thickness_slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1191</x>
-     <y>547</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1153</x>
-     <y>547</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>draw_line_checkBox</sender>
    <signal>toggled(bool)</signal>
    <receiver>thickness_slider</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>965</x>
-     <y>505</y>
+     <x>968</x>
+     <y>504</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1153</x>
-     <y>547</y>
+     <x>1156</x>
+     <y>546</y>
     </hint>
    </hints>
   </connection>
@@ -1864,12 +1806,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>965</x>
-     <y>505</y>
+     <x>968</x>
+     <y>504</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1191</x>
-     <y>547</y>
+     <x>1194</x>
+     <y>546</y>
     </hint>
    </hints>
   </connection>
@@ -1880,12 +1822,12 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1153</x>
-     <y>547</y>
+     <x>1156</x>
+     <y>546</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1191</x>
-     <y>547</y>
+     <x>1194</x>
+     <y>546</y>
     </hint>
    </hints>
   </connection>
