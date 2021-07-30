@@ -14,6 +14,6 @@ This Application allows the user to apply Delaunay triangulation to videos as a 
 	- **This program is extremely RAM intensive, recommended to use videos < 30 seconds for PC with 16GB of RAM.**
 
 ## Dependences
-*   This package is dependent on Qt being already install on linux distributions.
+*   This package is dependent on Qt being already installed on linux distributions.
 ### Github: https://github.com/chensation/Delaunay-Dream
 
