@@ -15,6 +15,9 @@
 ## Devin Mix
 * (6/10) Research how to sample points from images using openCV
 * (6/17) Refactor and trim a thresholding method for triangulation based on that used by PyTri
+* (6/21) Identify key bottlenecks in the threshold-based point generation method
+* (6/21) Correct inaccuracies with regard to thresholding and edge detection
+* (7/07) Trim and optimize thresholding method, rework max points argument
 * (7/10) Research the licensing for PyTri
 * (7/22) Experiment with processing video without saving it in RAM
 
