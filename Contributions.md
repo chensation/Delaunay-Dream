@@ -21,5 +21,6 @@
 * (7/10) Research the licensing for PyTri
 * (7/12) Implement custom Poisson Disk Sampling (PDS) algorithm
 * (7/22) Experiment with processing video without saving it in RAM
+* (7/29) Reimplement PDS function in Cython, various bug fixes
 
 ## Jiahao Fan
