@@ -101,6 +101,13 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.playback_thread.update_curr_frame.connect(self.set_curr_frame)
         self.play = False
 
+        # preview set up
+        self.preview_worker = GeneralWorker()
+        self.preview_worker.in_process.connect(self.on_preview_updating)
+        self.preview_worker.finished.connect(self.on_preview_finished)
+        self.preview_worker.func = self.display_preview_from_playback
+        self.preview_worker.in_process_str = "PROCESSING PREVIEW..."
+
         # Video Playback ui
         self.video_slider.setPageStep(0)
         self.play_button.clicked.connect(self.on_play_clicked)
@@ -130,15 +137,21 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.file_dialogue.ok_button.clicked.connect(self.thread_load_video)
 
         # filter options
-        self.hue_spinBox.valueChanged['int'].connect(self.set_hue)
-        self.saturation_spinBox.valueChanged['int'].connect(self.set_saturation)
-        self.brightness_spinBox.valueChanged['int'].connect(self.set_brightness)
+        self.hue_spinBox.editingFinished.connect(self.set_hue)
+        self.saturation_spinBox.editingFinished.connect(self.set_saturation)
+        self.brightness_spinBox.editingFinished.connect(self.set_brightness)
         self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
-        self.max_points_spinBox.valueChanged['int'].connect(self.set_num_pts)
+        self.hue_slider.sliderReleased.connect(self.set_hue)
+        self.saturation_slider.sliderReleased.connect(self.set_saturation)
+        self.brightness_slider.sliderReleased.connect(self.set_brightness)
+        self.triangulation_check_box.toggled['bool'].connect(self.set_triangulation)
+        self.max_points_spinBox.editingFinished.connect(self.set_num_pts)
+        self.max_points_spinBox.editingFinished.connect(self.set_num_pts)
         self.poisson_disk_radioButton.toggled['bool'].connect(self.set_sampling_method)
         self.scale_factor_comboBox.currentTextChanged['QString'].connect(self.set_image_scale)
         self.draw_line_checkBox.toggled['bool'].connect(self.set_line)
-        self.thickness_spinBox.valueChanged['int'].connect(self.set_line_thickness)
+        self.thickness_slider.sliderReleased.connect(self.set_line_thickness)
+        self.thickness_spinBox.editingFinished.connect(self.set_line_thickness)
 
         # file options
         self.apply_button.clicked.connect(self.thread_process_video)
@@ -164,20 +177,20 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.process.triangulate = triangulate
 
     @_update_func
-    def set_hue(self, hue):
-        self.process.hue = hue
+    def set_hue(self):
+        self.process.hue = self.hue_spinBox.value()
 
     @_update_func
-    def set_saturation(self, saturation):
-        self.process.saturation = saturation
+    def set_saturation(self):
+        self.process.saturation = self.saturation_spinBox.value()
 
     @_update_func
-    def set_brightness(self, brightness):
-        self.process.brightness = brightness
+    def set_brightness(self):
+        self.process.brightness = self.brightness_spinBox.value()
 
     @_update_func
-    def set_num_pts(self, num):
-        self.triangulation.num_points = num
+    def set_num_pts(self):
+        self.triangulation.num_points = self.max_points_spinBox.value()
 
     @_update_func
     def set_sampling_method(self, method):
@@ -217,8 +230,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.triangulation.draw_line = line
 
     @_update_func
-    def set_line_thickness(self, thickness):
-        self.triangulation.line_thickness = thickness
+    def set_line_thickness(self):
+        self.triangulation.line_thickness = self.thickness_spinBox.value()
 
     def resizeEvent(self, event):
         self.width = self.video_player.width()
@@ -324,15 +337,20 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.thread_update_preview()
 
     def thread_update_preview(self):
-        reconnect(self.worker.in_process, self.on_preview_updating)
-        reconnect(self.worker.finished, None)
-
-        self.worker.func = self.display_preview_from_playback
-        self.worker.in_process_str = "PROCESSING PREVIEW..."
-        self.worker.start()
+        self.preview_worker.start()
 
     def on_preview_updating(self, s):
         self.video_player.setText(s)
+        self.video_slider.setEnabled(False)
+        self.play_button.setEnabled(False)
+        self.stop_button.setEnabled(False)
+        self.all_options.setEnabled(False)
+
+    def on_preview_finished(self, s):
+        self.video_slider.setEnabled(True)
+        self.play_button.setEnabled(True)
+        self.stop_button.setEnabled(True)
+        self.all_options.setEnabled(True)
 
     ### file functions ###
 
