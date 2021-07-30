@@ -95,6 +95,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.applied_changes = True
         self.allow_preview_update = True
         self.dark_mode = True
+        self.curr_frame = None
 
         # video setup
         self.video = Video()
@@ -136,7 +137,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # Pop-up Dialog  
         self.warning_dialogue = WarningDialogue()
         self.file_dialogue = FileDialogue(self.video)
-        self.file_dialogue.ok_button.clicked.connect(self.thread_load_video)
+        self.file_dialogue.finished.connect(self.thread_load_video)
 
         # filter options
         self.hue_spinBox.editingFinished.connect(self.set_hue)
@@ -168,8 +169,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def _update_func(func, *args, **kwargs):
         def inner(self, *args, **kwargs):
             func(self, *args, *kwargs)
-            if self.have_file and not self.play and self.allow_preview_update:
+            if self.allow_preview_update:
                 self.applied_changes = False
+                self.reset_button.setEnabled(True)
+            if self.have_file and not self.play and self.allow_preview_update:
                 self.thread_update_preview()
 
         return inner
@@ -242,8 +245,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def resizeEvent(self, event):
         self.width = self.video_player.width()
         self.height = self.video_player.height()
-        if self.have_file and not self.play:
-                self.thread_update_preview()
+        if self.have_file and not self.play and self.allow_preview_update and self.video_player.pixmap() != None:
+            self.set_curr_frame(self.curr_frame)
 
     ### filter functions ###
 
@@ -369,7 +372,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.thread_update_preview()
 
     def thread_update_preview(self):
-        self.preview_worker.start()
+        if not self.applied_changes:
+            self.preview_worker.start()
 
     def on_preview_updating(self, s):
         self.video_player.setText(s)
@@ -387,6 +391,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def thread_load_video(self):
         try:
+            if self.play and self.have_file:
+                self.play = False
+                self.playback_thread.play = False
+                self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+
             reconnect(self.worker.in_process, self.disable_options)
             reconnect(self.worker.finished, self.on_load_finished)
             self.worker.func = self.video.load_frames
@@ -402,8 +411,11 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.open_button.setEnabled(True)
 
     def thread_process_video(self):
-        if self.play:
-            self.on_play_clicked()
+        if self.play and self.have_file:
+                self.play = False
+                self.playback_thread.play = False
+                self.play_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+
         reconnect(self.worker.in_process, self.disable_options)
         reconnect(self.worker.finished, self.on_process_finished)
         self.worker.func = self.process_video
@@ -451,7 +463,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.enable_options()
         self.applied_changes = True
         self.playback_thread.curr_frame = self.playback_thread.video.frames[self.playback_thread.curr_frame_idx]
-        self.set_curr_frame(self.playback_thread.curr_frame)
+        self.curr_frame = self.playback_thread.curr_frame
+        self.set_curr_frame(self.curr_frame)
 
     def on_load_finished(self, s):
         if len(self.video.frames) == 0:
@@ -496,6 +509,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         if self.process.triangulate:
             image = self.triangulation.apply_triangulation(image)
 
+        self.curr_frame = image
         self.set_curr_frame(image)
 
     def frame_to_qt(self, frame):
