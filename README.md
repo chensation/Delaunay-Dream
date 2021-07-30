@@ -11,7 +11,7 @@ This Application allows the user to apply Delaunay triangulation to videos as a 
  
 ## Commands
 *   To run the program, type `delaunaydream` in your terminal.
-	- **This program is extremely RAM intensive, recommended to use videos < 1 min for PC with 16GB of RAM.**
+	- **This program is extremely RAM intensive, recommended to use videos < 30 seconds for PC with 16GB of RAM.**
 
 ## Dependences
 *   This package is dependent on Qt being already install on linux distributions.
