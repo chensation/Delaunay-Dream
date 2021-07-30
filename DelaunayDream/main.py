@@ -94,6 +94,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.have_file = False
         self.applied_changes = True
         self.allow_preview_update = True
+        self.dark_mode = True
         self.curr_frame = None
 
         # video setup
@@ -183,14 +184,17 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     @_update_func
     def set_hue(self):
         self.process.hue = self.hue_spinBox.value()
+        self.hue_slider.setValue(self.hue_spinBox.value())
 
     @_update_func
     def set_saturation(self):
         self.process.saturation = self.saturation_spinBox.value()
+        self.saturation_slider.setValue(self.saturation_spinBox.value())
 
     @_update_func
     def set_brightness(self):
         self.process.brightness = self.brightness_spinBox.value()
+        self.brightness_slider.setValue(self.brightness_spinBox.value())
 
     @_update_func
     def set_num_pts(self):
@@ -236,6 +240,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     @_update_func
     def set_line_thickness(self):
         self.triangulation.line_thickness = self.thickness_spinBox.value()
+        self.thickness_slider.setValue(self.thickness_spinBox.value())
 
     def resizeEvent(self, event):
         self.width = self.video_player.width()
@@ -268,6 +273,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.allow_preview_update = True
 
     def disable_options(self, s):
+        if self.dark_mode == True:
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#4D4D4D'))
+        else:
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#E0E0E0'))
         self.update_console_message(s)
         self.export_button.setEnabled(False)
         self.open_button.setEnabled(False)
@@ -279,6 +288,10 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.all_options.setEnabled(False)
 
     def enable_options(self):
+        if self.dark_mode == True:
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
+        else:
+            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#973680'))
         self.export_button.setEnabled(True)
         self.open_button.setEnabled(True)
         self.apply_button.setEnabled(True)
@@ -292,15 +305,23 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def dark_light_mode(self, mode):
         if mode == True:
+            self.dark_mode = False
             self.setStyleSheet(StyleSheet().light_mode)
             self.file_dialogue.setStyleSheet(StyleSheet().light_mode)
             self.warning_dialogue.setStyleSheet(StyleSheet().light_mode)
-            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#973680'))
+            if self.triangulation_check_box.isEnabled() == True:
+                self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#973680'))
+            else:
+                self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#E0E0E0'))
         else:
+            self.dark_mode = True
             self.file_dialogue.setStyleSheet(StyleSheet().dark_mode)
             self.warning_dialogue.setStyleSheet(StyleSheet().dark_mode)
             self.setStyleSheet(StyleSheet().dark_mode)
-            self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
+            if self.triangulation_check_box.isEnabled() == True:
+                self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#135680'))
+            else:
+                self.triangulation_check_box._bar_checked_brush.setColor(QtGui.QColor('#4D4D4D'))
 
     ### video functions ###
 
