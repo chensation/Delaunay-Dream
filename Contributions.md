@@ -19,6 +19,7 @@
 * (6/21) Correct inaccuracies with regard to thresholding and edge detection
 * (7/07) Trim and optimize thresholding method, rework max points argument
 * (7/10) Research the licensing for PyTri
+* (7/12) Implement custom Poisson Disk Sampling (PDS) algorithm
 * (7/22) Experiment with processing video without saving it in RAM
 
 ## Jiahao Fan
