@@ -11,6 +11,23 @@
 ## Octavio Ochoa
 * (6/10) Create three wireframes for the GUI
 * (6/10) Research python GUI libraries
+* (6/17) Degined GUI layout using QT Desinger
+* (6/17) Integrated video playback, upload file functionality and brightness adjuster using OpenCV and PyQt for Proof of Concepts
+* (6/24) Connected functions to GUI components
+* (6/24) Changed GUI layout to reflect image display instead of video playback
+* (7/08) Redesigned GUI layout with new video playback and editing options
+* (7/15) Fixed GUI spacing and sizing to expand accordingly to Window size
+* (7/15) Created pop-up dialog for frame rate and file selection
+* (7/15) Created warning dialog for displaying warning messages
+* (7/15) Added interchangeable play/pause button with icons
+* (7/22) Appended widgets to include sampling method radio buttons and scale factor drop down
+* (7/22) Applied alternating dark and light mode stylesheets to all widgets
+* (7/22) Replaced mode and triangualte check boxes with toggles
+* (7/29) Completed stylesheet for all widgets including: logo inspired color schemes, rounder corners on all squared widgets, alternating colors for dark/light mode and disabled/enabled widgets, circled slider handles and video playback buttons, and gradient background, spin boxes and buttons.
+* (7/29) Repaced QLabel status message with QTextBrowser and added vertical scrolling for long messages
+* (7/29) Integrated warning dialog to export button and poisson disk option with appropiate messages and options to proceed or cancel
+* (7/29) Added tooltips and status tips to all options
+* (7/29) Readjusted max sizes to function with screens that have resolutions higher than 1080p
 
 ## Devin Mix
 * (6/10) Research how to sample points from images using openCV
@@ -24,11 +41,3 @@
 * (7/29) Reimplement PDS function in Cython, various bug fixes
 
 ## Jiahao Fan
-* (6/10) Research general information on openCV
-* (6/17) Create basic video processing pipeline structure
-* (6/17) Implement basic canny edge detection
-* (6/24) Implement video pipeline
-* (6/24) Connect front end GUI with video pipeline
-* (7/07) Research multithreading options for GUI
-* (7/14) Implement QThread to prevent GUI from freezing
-* (7/21) Implement video playback
