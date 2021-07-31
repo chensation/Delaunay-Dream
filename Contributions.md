@@ -34,3 +34,6 @@
 * (7/10) Research the licensing for PyTri
 
 ## Jiahao Fan
+* (6/10) Research for video processing library
+* (6/10) Research on general OpenCv information
+* (7/15) Research on GUI multithreading options
