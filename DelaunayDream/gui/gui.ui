@@ -308,7 +308,7 @@
         <item>
          <widget class="QLabel" name="dark_mode_label">
           <property name="text">
-           <string>Dark Mode</string>
+           <string>Dark</string>
           </property>
          </widget>
         </item>
@@ -343,7 +343,7 @@
         <item>
          <widget class="QLabel" name="light_mode_label">
           <property name="text">
-           <string>Light Mode</string>
+           <string>Light</string>
           </property>
          </widget>
         </item>
