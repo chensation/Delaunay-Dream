@@ -8,6 +8,7 @@
 * (7/14) Research Multi-processing and shared memory in Python
 * (7/22) Publish Prototype to PYPI
 * (7/22) Experiment with processing video without saving it in RAM
+* (7/30) Uploaded to PyPi
 
 ## Octavio Ochoa
 * (6/10) Create three wireframes for the GUI
