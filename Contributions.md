@@ -12,7 +12,8 @@
 ## Octavio Ochoa
 * (6/10) Create three wireframes for the GUI
 * (6/10) Research python GUI libraries
-* (7/08) Redesign GUI layout with new video playback and editing options
+* (6/17) Research PyQT designer and widget libraries
+* (7/08) Research custom widget libraries
 
 ## Devin Mix
 * (6/10) Research how to sample points from images using openCV
