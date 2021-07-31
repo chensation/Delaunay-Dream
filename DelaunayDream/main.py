@@ -220,11 +220,12 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     @_update_func
     def set_image_scale(self, scale):
-        scale_num = int(scale[:-1])
-        if scale_num >= 50:
-            self.warning_dialogue.warning_message.setText("Although a higher image scale allows more accurate colors, \n"
-                                                          "it causes the triangulation to be much slower\n\n"
-                                                          f"Are you sure you want the image scale to be {scale}?")
+        scale_num = int(scale[:-1])                         #Scale Factor is used when downsizes the image for colors sampling
+        if scale_num >= 50:                               #Factor by which the image is downsized when sampling colors
+                                                           #Higher values increase color accuracy at the expense of speed
+            self.warning_dialogue.warning_message.setText("This determines the size of frames used when sampling colors.\n"
+                                                          "Higher values increase color accuracy but decrease speed.\n\n"
+                                                          f"Are you sure you want the scale factor to be {scale}?")
             self.warning_dialogue.exec_()
 
         if self.warning_dialogue.cancel_changes:

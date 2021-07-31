@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'gui/gui.ui'
+# Form implementation generated from reading ui file 'DelaunayDream/gui/gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -613,8 +613,8 @@ class Ui_MainWindow(object):
         self.poisson_disk_radioButton.setText(_translate("MainWindow", "Poisson Disk"))
         self.scale_factor_label.setStatusTip(_translate("MainWindow", "Scale Factor"))
         self.scale_factor_label.setText(_translate("MainWindow", "Scale Factor"))
-        self.scale_factor_comboBox.setToolTip(_translate("MainWindow", "Scale Factor determines how accurate the colors of the triangulated images are (higher is slower)"))
-        self.scale_factor_comboBox.setStatusTip(_translate("MainWindow", "Scale Factor determines how accurate the colors of the triangulated images are (higher is slower)"))
+        self.scale_factor_comboBox.setToolTip(_translate("MainWindow", "Scale Factor determines size of image used to sample colors during triangulation (higher is slower)"))
+        self.scale_factor_comboBox.setStatusTip(_translate("MainWindow", "Scale Factor determines size of image used to sample colors during triangulation (higher is slower)"))
         self.scale_factor_comboBox.setCurrentText(_translate("MainWindow", "10%"))
         self.scale_factor_comboBox.setItemText(0, _translate("MainWindow", "5%"))
         self.scale_factor_comboBox.setItemText(1, _translate("MainWindow", "10%"))

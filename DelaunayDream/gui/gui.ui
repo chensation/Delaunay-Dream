@@ -1387,10 +1387,10 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="toolTip">
-                <string>Scale Factor determines how accurate the colors of the triangulated images are (higher is slower)</string>
+                <string>Scale Factor determines size of image used to sample colors during triangulation (higher is slower)</string>
                </property>
                <property name="statusTip">
-                <string>Scale Factor determines how accurate the colors of the triangulated images are (higher is slower)</string>
+                <string>Scale Factor determines size of image used to sample colors during triangulation (higher is slower)</string>
                </property>
                <property name="inputMethodHints">
                 <set>Qt::ImhNone</set>
