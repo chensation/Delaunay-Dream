@@ -306,6 +306,13 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_18">
         <item>
+         <widget class="QLabel" name="dark_mode_label">
+          <property name="text">
+           <string>Dark Mode</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="AnimatedToggle" name="mode_toggle">
           <property name="minimumSize">
            <size>
@@ -330,6 +337,13 @@
           </property>
           <property name="text">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="light_mode_label">
+          <property name="text">
+           <string>Light Mode</string>
           </property>
          </widget>
         </item>

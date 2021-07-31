@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'DelaunayDream/gui/gui.ui'
+# Form implementation generated from reading ui file 'gui/gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -107,6 +107,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.addLayout(self.verticalLayout_6)
         self.horizontalLayout_18 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_18.setObjectName("horizontalLayout_18")
+        self.dark_mode_label = QtWidgets.QLabel(self.centralwidget)
+        self.dark_mode_label.setObjectName("dark_mode_label")
+        self.horizontalLayout_18.addWidget(self.dark_mode_label)
         self.mode_toggle = AnimatedToggle(self.centralwidget)
         self.mode_toggle.setMinimumSize(QtCore.QSize(58, 45))
         self.mode_toggle.setMaximumSize(QtCore.QSize(58, 45))
@@ -114,6 +117,9 @@ class Ui_MainWindow(object):
         self.mode_toggle.setText("")
         self.mode_toggle.setObjectName("mode_toggle")
         self.horizontalLayout_18.addWidget(self.mode_toggle)
+        self.light_mode_label = QtWidgets.QLabel(self.centralwidget)
+        self.light_mode_label.setObjectName("light_mode_label")
+        self.horizontalLayout_18.addWidget(self.light_mode_label)
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_18.addItem(spacerItem4)
         self.verticalLayout_7.addLayout(self.horizontalLayout_18)
@@ -559,8 +565,10 @@ class Ui_MainWindow(object):
         self.play_button.setStatusTip(_translate("MainWindow", "Play/Pause Video"))
         self.stop_button.setToolTip(_translate("MainWindow", "Stop Video"))
         self.stop_button.setStatusTip(_translate("MainWindow", "Stop Video"))
+        self.dark_mode_label.setText(_translate("MainWindow", "Dark Mode"))
         self.mode_toggle.setToolTip(_translate("MainWindow", "Dark/Light Mode Toggle"))
         self.mode_toggle.setStatusTip(_translate("MainWindow", "Dark/Light Mode Toggle"))
+        self.light_mode_label.setText(_translate("MainWindow", "Light Mode"))
         self.apply_button.setToolTip(_translate("MainWindow", "Apply Changes to All Frames"))
         self.apply_button.setStatusTip(_translate("MainWindow", "Apply Changes to All Frames"))
         self.apply_button.setText(_translate("MainWindow", "Apply to All Frames"))
