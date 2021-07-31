@@ -61,35 +61,39 @@ class Video:
     def load_frames(self):
         """ read the video according to filename,
         """
-        self._frames = ()
 
         temp_array = []
-        cap = cv.VideoCapture(self._filename)
-        original_fps = math.ceil(cap.get(cv.CAP_PROP_FPS)) # get video frame rate, use ceil as 23.976 fps is a popular format
-        self._fourcc = cv.VideoWriter_fourcc(*'XVID')
-        width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
-        height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
-        self._video_size = (width, height)
+        try:
+            cap = cv.VideoCapture(self._filename)
+            self._audio = AudioFileClip(self._filename)
+            self._frames = ()
+            original_fps = math.ceil(cap.get(cv.CAP_PROP_FPS)) # get video frame rate, use ceil as 23.976 fps is a popular format
+            self._fourcc = cv.VideoWriter_fourcc(*'XVID')
+            width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
+            height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
+            self._video_size = (width, height)
 
-        if not self._fps:
-            self._fps = original_fps
+            if not self._fps:
+                self._fps = original_fps
 
-        # only read frames needed for the target fps
-        step_size = int(original_fps/self._fps)
-        curr_index = 0
-        while True:
-            success, frame = cap.read()
-            if not success:
-                break
- 
-            if curr_index % step_size == 0:
-                temp_array.append(frame)
+            # only read frames needed for the target fps
+            step_size = int(original_fps/self._fps)
+            curr_index = 0
+            while True:
+                success, frame = cap.read()
+                if not success:
+                    break
 
-            curr_index += 1
+                if curr_index % step_size == 0:
+                    temp_array.append(frame)
 
-        cap.release()
-        self._frames = np.asarray(temp_array)
-        self._audio = AudioFileClip(self._filename)
+                curr_index += 1
+
+            self._frames = np.asarray(temp_array)
+        except Exception:
+            raise ValueError(f"Unabled to read from {self._filename}")
+        finally:
+            cap.release()
 
     def export_video(self, filename, have_color=True):
 

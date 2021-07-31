@@ -37,6 +37,7 @@ class GeneralWorker(QThread):
     """
     in_process = pyqtSignal(str)
     finished = pyqtSignal(str)
+    errored = pyqtSignal(str)
 
     def __init__(self):
         QThread.__init__(self)
@@ -45,10 +46,12 @@ class GeneralWorker(QThread):
         self.finished_str = ""
 
     def run(self):
-        self.in_process.emit(self.in_process_str)
-        self.func()
-        self.finished.emit(self.finished_str)
-
+        try:
+            self.in_process.emit(self.in_process_str)
+            self.func()
+            self.finished.emit(self.finished_str)
+        except Exception as err:
+            self.errored.emit(str(err))
 
 class VideoWorker(QThread):
     """ Thread for video player
@@ -399,6 +402,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
             reconnect(self.worker.in_process, self.disable_options)
             reconnect(self.worker.finished, self.on_load_finished)
+            reconnect(self.worker.errored, self.on_load_errored)
+
             self.worker.func = self.video.load_frames
             self.width = self.video_player.width()
             self.height = self.video_player.height()
@@ -407,9 +412,7 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             self.worker.start()
 
         except Exception:
-            self.update_console_message("Failed to load video")
-            self.export_button.setEnabled(True)
-            self.open_button.setEnabled(True)
+            self.on_load_errored("Failed to load video")
 
     def thread_process_video(self):
         if self.play and self.have_file:
@@ -491,6 +494,14 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.reset_button.setEnabled(False)
         self.update_console_message(s)
         self.display_preview_from_playback()
+
+    def on_load_errored(self, s):
+        if not self.have_file:
+            self.update_console_message(s)
+            self.open_button.setEnabled(True)
+        else:
+            self.on_load_finished(s)
+            self.reset_button.setEnabled(True)
 
     def on_export_finished(self, s):
         self.update_console_message(s)
