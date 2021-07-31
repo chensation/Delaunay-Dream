@@ -422,6 +422,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         reconnect(self.worker.in_process, self.disable_options)
         reconnect(self.worker.finished, self.on_process_finished)
+        reconnect(self.worker.errored, self.on_process_finished)
+
         self.worker.func = self.process_video
         self.worker.in_process_str = "Applying changes to all frames, please wait..."
         self.worker.finished_str = "All frames processed"
@@ -449,6 +451,8 @@ class GuiWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
             reconnect(self.worker.in_process, self.on_exporting)
             reconnect(self.worker.finished, self.on_export_finished)
+            reconnect(self.worker.errored, self.on_export_finished)
+
             self.worker.func = export
             self.worker.in_process_str = f"Writing to {os.path.basename(output_filename + extension)}..."
             self.worker.finished_str = "Write finished, go take a look"
