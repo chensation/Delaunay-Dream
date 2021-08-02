@@ -77,3 +77,13 @@ Devin left at 9:40PM
 (individual meeting) Siyu, Sumanth  
 
 Final submission
+
+### 7/31/21 2:00PM - 5:33PM
+All team member present
+
+final presentation prepare
+
+### 8/1/21 2:00PM - 3:30PM
+All team member present
+
+final presentation practice
